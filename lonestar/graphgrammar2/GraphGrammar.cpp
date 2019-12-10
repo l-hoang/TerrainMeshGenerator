@@ -6,17 +6,18 @@
 #include "model/Graph.h"
 #include "productions/Production.h"
 #include "productions/Production1.h"
+#include "utils/MyGraphFormatWriter.h"
 //#include "GraphManager.h"
 
 
 
-static const char* name = "Mesh generator";
-static const char* desc = "...";
-static const char* url = "mesh_generator";
+static const char *name = "Mesh generator";
+static const char *desc = "...";
+static const char *url = "mesh_generator";
 
 void generateSampleGraph(Graph &graph);
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     galois::SharedMemSys G;
     std::cout << "Hello1\n\n";
     LonestarStart(argc, argv, name, desc, url);//---------
@@ -38,15 +39,16 @@ int main(int argc, char** argv) {
 
     galois::reportPageAlloc("MeminfoPre2");
 
+    MyGraphFormatWriter writer;
+    writer.writeToFile(graph, "graph.mgf");
 
+//    Production1 production1;
 
-    Production1 production1;
-
-    galois::do_all(galois::iterate(graph.begin(), graph.end()),[&](GNode node) {
-        if (production1.isPossible(node, graph)) {
-            production1.execute(node, graph);
-        }
-    });
+//    galois::do_all(galois::iterate(graph.begin(), graph.end()), [&](GNode node) {
+//        if (production1.isPossible(node, graph)) {
+//            production1.execute(node, graph);
+//        }
+//    });
 
 
     return 0;
@@ -54,12 +56,12 @@ int main(int argc, char** argv) {
 
 void generateSampleGraph(Graph &graph) {
     GNode node1, node2, node3, node4, hEdge1, hEdge2;
-    node1 = graph.createNode(SingleNode {0,0,0});
-    node2 = graph.createNode(SingleNode {0,1,0});
-    node3 = graph.createNode(SingleNode {1,0,0});
-    node4 = graph.createNode(SingleNode {1,1,0});
-    hEdge1 = graph.createNode(HyperEdge{true});
-    hEdge2 = graph.createNode(HyperEdge{true});
+    node1 = graph.createNode(NodeData{false, Coordinates{0, 0, 0}});
+    node2 = graph.createNode(NodeData{false, Coordinates{0, 1, 0}});
+    node3 = graph.createNode(NodeData{false, Coordinates{1, 0, 0}});
+    node4 = graph.createNode(NodeData{false, Coordinates{1, 1, 0}});
+    hEdge1 = graph.createNode(NodeData{true, true});
+    hEdge2 = graph.createNode(NodeData{true, true});
 
     graph.addNode(node1);
     graph.addNode(node2);
@@ -70,8 +72,8 @@ void generateSampleGraph(Graph &graph) {
 
     graph.addEdge(node1, node2);
     graph.getEdgeData(graph.findEdge(node1, node2)).setBorder(true);
-    graph.addEdge(node2, node3);
-    graph.getEdgeData(graph.findEdge(node2, node3)).setBorder(true);
+    graph.addEdge(node2, node4);
+    graph.getEdgeData(graph.findEdge(node2, node4)).setBorder(true);
     graph.addEdge(node3, node4);
     graph.getEdgeData(graph.findEdge(node3, node4)).setBorder(true);
     graph.addEdge(node4, node1);

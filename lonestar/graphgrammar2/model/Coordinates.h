@@ -9,6 +9,8 @@ private:
 public:
     Coordinates(double x, double y, double z) : x(x), y(y), z(z) {}
 
+    Coordinates() {}
+
     double getX() const {
         return x;
     }
@@ -34,13 +36,13 @@ public:
     }
 
     std::string toString() const {
-        return 'x' + std::to_string(x) + ", y" + std::to_string(y) + ", z" + std::to_string(z);
+        return  std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(z);
     }
 
     bool operator==(const Coordinates &rhs) const {
-        return x == rhs.x &&
-               y == rhs.y &&
-               z == rhs.z;
+        return abs(x - rhs.x) < 1e-8 &&
+               abs(y - rhs.y) < 1e-8 &&
+               abs(z - rhs.z) < 1e-8;
     }
 
     bool operator!=(const Coordinates &rhs) const {
