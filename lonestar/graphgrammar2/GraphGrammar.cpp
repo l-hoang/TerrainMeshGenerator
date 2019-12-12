@@ -7,6 +7,7 @@
 #include "productions/Production.h"
 #include "productions/Production1.h"
 #include "utils/MyGraphFormatWriter.h"
+#include "utils/ConnectivityManager.h"
 //#include "GraphManager.h"
 
 
@@ -16,13 +17,14 @@ static const char *desc = "...";
 static const char *url = "mesh_generator";
 
 void generateSampleGraph(Graph &graph);
+void generateSampleGraph2(Graph &graph);
 
 int main(int argc, char **argv) {
     galois::SharedMemSys G;
     std::cout << "Hello1\n\n";
     LonestarStart(argc, argv, name, desc, url);//---------
     Graph graph{};
-    generateSampleGraph(graph);
+    generateSampleGraph2(graph);
     std::cout << "Hello";
 
     galois::reportPageAlloc("MeminfoPre1");
@@ -42,24 +44,32 @@ int main(int argc, char **argv) {
     MyGraphFormatWriter writer;
     writer.writeToFile(graph, "graph.mgf");
 
-//    Production1 production1;
 
-//    galois::do_all(galois::iterate(graph.begin(), graph.end()), [&](GNode node) {
+//    Production1 production1{graph};
+//    galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto& ctx) {
 //        if (production1.isPossible(node, graph)) {
-//            production1.execute(node, graph);
+//            production1.execute(node, graph, ctx);
 //        }
 //    });
 
+//    for (auto node : graph) {
+//        if (production1.isPossible(node, graph)) {
+//            production1.execute(node, graph);
+//        }
+//    }
+
+//    MyGraphFormatWriter writer;
+//    writer.writeToFile(graph, "graph.mgf");
 
     return 0;
 }
 
 void generateSampleGraph(Graph &graph) {
     GNode node1, node2, node3, node4, hEdge1, hEdge2;
-    node1 = graph.createNode(NodeData{false, Coordinates{0, 0, 0}});
-    node2 = graph.createNode(NodeData{false, Coordinates{0, 1, 0}});
-    node3 = graph.createNode(NodeData{false, Coordinates{1, 0, 0}});
-    node4 = graph.createNode(NodeData{false, Coordinates{1, 1, 0}});
+    node1 = graph.createNode(NodeData{false, Coordinates{0, 0, 0}, false});
+    node2 = graph.createNode(NodeData{false, Coordinates{0, 1, 0}, false});
+    node3 = graph.createNode(NodeData{false, Coordinates{1, 0, 0}, false});
+    node4 = graph.createNode(NodeData{false, Coordinates{1, 1, 0}, false});
     hEdge1 = graph.createNode(NodeData{true, true});
     hEdge2 = graph.createNode(NodeData{true, true});
 
@@ -72,14 +82,24 @@ void generateSampleGraph(Graph &graph) {
 
     graph.addEdge(node1, node2);
     graph.getEdgeData(graph.findEdge(node1, node2)).setBorder(true);
+    graph.getEdgeData(graph.findEdge(node1, node2)).setMiddlePoint(Coordinates{0,0.5,0});
+    graph.getEdgeData(graph.findEdge(node1, node2)).setLength(1);
     graph.addEdge(node2, node4);
     graph.getEdgeData(graph.findEdge(node2, node4)).setBorder(true);
+    graph.getEdgeData(graph.findEdge(node2, node4)).setMiddlePoint(Coordinates{0.5,1,0});
+    graph.getEdgeData(graph.findEdge(node2, node4)).setLength(1);
     graph.addEdge(node3, node4);
     graph.getEdgeData(graph.findEdge(node3, node4)).setBorder(true);
-    graph.addEdge(node4, node1);
-    graph.getEdgeData(graph.findEdge(node4, node1)).setBorder(true);
+    graph.getEdgeData(graph.findEdge(node3, node4)).setMiddlePoint(Coordinates{1,0.5,0});
+    graph.getEdgeData(graph.findEdge(node3, node4)).setLength(1);
     graph.addEdge(node1, node3);
     graph.getEdgeData(graph.findEdge(node1, node3)).setBorder(false);
+    graph.getEdgeData(graph.findEdge(node1, node3)).setMiddlePoint(Coordinates{0.5,0,0});
+    graph.getEdgeData(graph.findEdge(node1, node3)).setLength(1);
+    graph.addEdge(node4, node1);
+    graph.getEdgeData(graph.findEdge(node4, node1)).setBorder(false);
+    graph.getEdgeData(graph.findEdge(node4, node1)).setMiddlePoint(Coordinates{0.5,0.5,0});
+    graph.getEdgeData(graph.findEdge(node4, node1)).setLength(sqrt(2));
 
     graph.addEdge(hEdge1, node1);
     graph.getEdgeData(graph.findEdge(hEdge1, node1)).setBorder(false);
@@ -94,4 +114,112 @@ void generateSampleGraph(Graph &graph) {
     graph.getEdgeData(graph.findEdge(hEdge2, node4)).setBorder(false);
     graph.addEdge(hEdge2, node3);
     graph.getEdgeData(graph.findEdge(hEdge2, node3)).setBorder(false);
+
+}
+
+
+void generateSampleGraph2(Graph &graph) {
+    GNode nodes[9];
+    for (int i = 0; i < 9; ++i) {
+        nodes[i] = graph.createNode(NodeData{false,
+                                             Coordinates{static_cast<double>(i%3), static_cast<double>(i/3), 0}, false});
+        graph.addNode(nodes[i]);
+    }
+    GNode hEdges[8];
+    for (auto & hEdge : hEdges) {
+        hEdge = graph.createNode(NodeData{true, true});
+        graph.addNode(hEdge);
+    }
+
+
+    graph.addEdge(nodes[0], nodes[1]);
+    graph.getEdgeData(graph.findEdge(nodes[0], nodes[1])).setBorder(true);
+    graph.getEdgeData(graph.findEdge(nodes[0], nodes[1])).setMiddlePoint(Coordinates{0.5,0,0});
+    graph.getEdgeData(graph.findEdge(nodes[0], nodes[1])).setLength(1);
+    graph.addEdge(nodes[1], nodes[2]);
+    graph.getEdgeData(graph.findEdge(nodes[1], nodes[2])).setBorder(true);
+    graph.getEdgeData(graph.findEdge(nodes[1], nodes[2])).setMiddlePoint(Coordinates{1.5,0,0});
+    graph.getEdgeData(graph.findEdge(nodes[1], nodes[2])).setLength(1);
+    graph.addEdge(nodes[0], nodes[3]);
+    graph.getEdgeData(graph.findEdge(nodes[0], nodes[3])).setBorder(true);
+    graph.getEdgeData(graph.findEdge(nodes[0], nodes[3])).setMiddlePoint(Coordinates{0,0.5,0});
+    graph.getEdgeData(graph.findEdge(nodes[0], nodes[3])).setLength(1);
+    graph.addEdge(nodes[1], nodes[4]);
+    graph.getEdgeData(graph.findEdge(nodes[1], nodes[4])).setBorder(true);
+    graph.getEdgeData(graph.findEdge(nodes[1], nodes[4])).setMiddlePoint(Coordinates{1,0.5,0});
+    graph.getEdgeData(graph.findEdge(nodes[1], nodes[4])).setLength(1);
+    graph.addEdge(nodes[2], nodes[5]);
+    graph.getEdgeData(graph.findEdge(nodes[2], nodes[5])).setBorder(true);
+    graph.getEdgeData(graph.findEdge(nodes[2], nodes[5])).setMiddlePoint(Coordinates{2,0.5,0});
+    graph.getEdgeData(graph.findEdge(nodes[2], nodes[5])).setLength(1);
+    graph.addEdge(nodes[3], nodes[4]);
+    graph.getEdgeData(graph.findEdge(nodes[3], nodes[4])).setBorder(true);
+    graph.getEdgeData(graph.findEdge(nodes[3], nodes[4])).setMiddlePoint(Coordinates{0.5,1,0});
+    graph.getEdgeData(graph.findEdge(nodes[3], nodes[4])).setLength(1);
+    graph.addEdge(nodes[4], nodes[5]);
+    graph.getEdgeData(graph.findEdge(nodes[4], nodes[5])).setBorder(true);
+    graph.getEdgeData(graph.findEdge(nodes[4], nodes[5])).setMiddlePoint(Coordinates{1.5,1,0});
+    graph.getEdgeData(graph.findEdge(nodes[4], nodes[5])).setLength(1);
+
+    graph.addEdge(nodes[3], nodes[6]);
+    graph.getEdgeData(graph.findEdge(nodes[3], nodes[6])).setBorder(true);
+    graph.getEdgeData(graph.findEdge(nodes[3], nodes[6])).setMiddlePoint(Coordinates{0,1.5,0});
+    graph.getEdgeData(graph.findEdge(nodes[3], nodes[6])).setLength(1);
+    graph.addEdge(nodes[4], nodes[7]);
+    graph.getEdgeData(graph.findEdge(nodes[4], nodes[7])).setBorder(true);
+    graph.getEdgeData(graph.findEdge(nodes[4], nodes[7])).setMiddlePoint(Coordinates{1,1.5,0});
+    graph.getEdgeData(graph.findEdge(nodes[4], nodes[7])).setLength(1);
+    graph.addEdge(nodes[5], nodes[8]);
+    graph.getEdgeData(graph.findEdge(nodes[5], nodes[8])).setBorder(true);
+    graph.getEdgeData(graph.findEdge(nodes[5], nodes[8])).setMiddlePoint(Coordinates{2,1.5,0});
+    graph.getEdgeData(graph.findEdge(nodes[5], nodes[8])).setLength(1);
+    graph.addEdge(nodes[6], nodes[7]);
+    graph.getEdgeData(graph.findEdge(nodes[6], nodes[7])).setBorder(true);
+    graph.getEdgeData(graph.findEdge(nodes[6], nodes[7])).setMiddlePoint(Coordinates{0.5,2,0});
+    graph.getEdgeData(graph.findEdge(nodes[6], nodes[7])).setLength(1);
+    graph.addEdge(nodes[7], nodes[8]);
+    graph.getEdgeData(graph.findEdge(nodes[7], nodes[8])).setBorder(true);
+    graph.getEdgeData(graph.findEdge(nodes[7], nodes[8])).setMiddlePoint(Coordinates{1.5,2,0});
+    graph.getEdgeData(graph.findEdge(nodes[7], nodes[8])).setLength(1);
+
+    for (int j = 0; j < 2; ++j) {
+        graph.addEdge(nodes[j], nodes[j+4]);
+        graph.getEdgeData(graph.findEdge(nodes[j], nodes[j+4])).setBorder(true);
+        graph.getEdgeData(graph.findEdge(nodes[j], nodes[j+4])).setMiddlePoint(Coordinates{0.5 + j/2,0.5 + j%2,0});
+        graph.getEdgeData(graph.findEdge(nodes[j], nodes[j+4])).setLength(sqrt(2));
+        graph.addEdge(nodes[j+3], nodes[j+7]);
+        graph.getEdgeData(graph.findEdge(nodes[j+3], nodes[j+7])).setBorder(true);
+        graph.getEdgeData(graph.findEdge(nodes[j+3], nodes[j+7])).setMiddlePoint(Coordinates{0.5 + j/2,0.5 + j%2,0});
+        graph.getEdgeData(graph.findEdge(nodes[j+3], nodes[j+7])).setLength(sqrt(2));
+    }
+
+    for (int k = 0; k < 4; ++k) {
+        graph.addEdge(hEdges[k], nodes[k]);
+        graph.addEdge(hEdges[k], nodes[k+1]);
+        graph.addEdge(hEdges[k], nodes[k+4]);
+
+        graph.addEdge(hEdges[k+4], nodes[k]);
+        graph.addEdge(hEdges[k+4], nodes[k+3]);
+        graph.addEdge(hEdges[k+4], nodes[k+4]);
+    }
+
+//    graph.addEdge(nodes[4], nodes[8]);
+//    graph.getEdgeData(graph.findEdge(nodes[4], nodes[8])).setBorder(false);
+//    graph.getEdgeData(graph.findEdge(nodes[4], nodes[8])).setMiddlePoint(Coordinates{1.5,1.5,0});
+//    graph.getEdgeData(graph.findEdge(nodes[4], nodes[8])).setLength(sqrt(2));
+
+//
+//    graph.addEdge(hEdge1, node1);
+//    graph.getEdgeData(graph.findEdge(hEdge1, node1)).setBorder(false);
+//    graph.addEdge(hEdge1, node2);
+//    graph.getEdgeData(graph.findEdge(hEdge1, node2)).setBorder(false);
+//    graph.addEdge(hEdge1, node3);
+//    graph.getEdgeData(graph.findEdge(hEdge1, node3)).setBorder(false);
+//
+//    graph.addEdge(hEdge2, node1);
+//    graph.getEdgeData(graph.findEdge(hEdge2, node1)).setBorder(false);
+//    graph.addEdge(hEdge2, node4);
+//    graph.getEdgeData(graph.findEdge(hEdge2, node4)).setBorder(false);
+//    graph.addEdge(hEdge2, node3);
+//    graph.getEdgeData(graph.findEdge(hEdge2, node3)).setBorder(false);
 }

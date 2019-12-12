@@ -22,7 +22,7 @@ using edge_iterator = galois::graphs::FileGraph::edge_iterator;
 //        HyperEdge::toRefine = toRefine;
 //    }
 //
-//    std::vector<GNode> getVertices(GNode thisNode, Graph &graph) {
+//    std::vector<GNode> getNeighbours(GNode thisNode, Graph &graph) {
 //        std::vector<GNode> vertices;
 //        for (Graph::edge_iterator ii = graph.edge_begin(thisNode), ee = graph.edge_end(thisNode); ii != ee; ++ii) {
 //            vertices.push_back(graph.getEdgeDst(ii));
@@ -32,7 +32,7 @@ using edge_iterator = galois::graphs::FileGraph::edge_iterator;
 //
 //    std::vector<optional<EdgeIterator>> getEdges(const GNode thisNode, Graph &graph) {
 //        std::vector<optional<EdgeIterator>> edges;
-//        auto vertices = getVertices(thisNode, graph);
+//        auto vertices = getNeighbours(thisNode, graph);
 //        for (auto vertex : vertices) {
 //            EdgeIterator edge = graph.findEdge(thisNode, vertex);
 //            if (edge.base() == edge.end()) {
