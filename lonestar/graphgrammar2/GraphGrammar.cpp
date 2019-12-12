@@ -1,15 +1,10 @@
 #include <galois/graphs/Graph.h>
 #include <Lonestar/BoilerPlate.h>
 #include "model/EdgeData.h"
-#include "model/HyperEdge.h"
-#include "model/SingleNode.h"
+#include "model/NodeData.h"
 #include "model/Graph.h"
-#include "productions/Production.h"
 #include "productions/Production1.h"
 #include "utils/MyGraphFormatWriter.h"
-#include "utils/ConnectivityManager.h"
-//#include "GraphManager.h"
-
 
 
 static const char *name = "Mesh generator";
@@ -21,19 +16,14 @@ void generateSampleGraph2(Graph &graph);
 
 int main(int argc, char **argv) {
     galois::SharedMemSys G;
-    std::cout << "Hello1\n\n";
     LonestarStart(argc, argv, name, desc, url);//---------
     Graph graph{};
-    generateSampleGraph2(graph);
-    std::cout << "Hello";
+    generateSampleGraph(graph);
 
     galois::reportPageAlloc("MeminfoPre1");
     // Tighter upper bound for pre-alloc, useful for machines with limited memory,
     // e.g., Intel MIC. May not be enough for deterministic execution
     constexpr size_t NODE_SIZE = sizeof(**graph.begin());
-    std::cout << galois::getActiveThreads() << std::endl;
-    std::cout << graph.size() << std::endl;
-    std::cout << galois::runtime::pagePoolSize() << std::endl;
 
     galois::preAlloc(5 * galois::getActiveThreads() +
                      NODE_SIZE * 32 * graph.size() /
@@ -42,24 +32,15 @@ int main(int argc, char **argv) {
     galois::reportPageAlloc("MeminfoPre2");
 
     MyGraphFormatWriter writer;
+
+    Production1 production1{graph};
+    galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto& ctx) {
+        if (production1.isPossible(node, graph)) {
+            production1.execute(node, graph, ctx);
+        }
+    });
+
     writer.writeToFile(graph, "graph.mgf");
-
-
-//    Production1 production1{graph};
-//    galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto& ctx) {
-//        if (production1.isPossible(node, graph)) {
-//            production1.execute(node, graph, ctx);
-//        }
-//    });
-
-//    for (auto node : graph) {
-//        if (production1.isPossible(node, graph)) {
-//            production1.execute(node, graph);
-//        }
-//    }
-
-//    MyGraphFormatWriter writer;
-//    writer.writeToFile(graph, "graph.mgf");
 
     return 0;
 }
@@ -203,23 +184,6 @@ void generateSampleGraph2(Graph &graph) {
         graph.addEdge(hEdges[k+4], nodes[k+4]);
     }
 
-//    graph.addEdge(nodes[4], nodes[8]);
-//    graph.getEdgeData(graph.findEdge(nodes[4], nodes[8])).setBorder(false);
-//    graph.getEdgeData(graph.findEdge(nodes[4], nodes[8])).setMiddlePoint(Coordinates{1.5,1.5,0});
-//    graph.getEdgeData(graph.findEdge(nodes[4], nodes[8])).setLength(sqrt(2));
 
-//
-//    graph.addEdge(hEdge1, node1);
-//    graph.getEdgeData(graph.findEdge(hEdge1, node1)).setBorder(false);
-//    graph.addEdge(hEdge1, node2);
-//    graph.getEdgeData(graph.findEdge(hEdge1, node2)).setBorder(false);
-//    graph.addEdge(hEdge1, node3);
-//    graph.getEdgeData(graph.findEdge(hEdge1, node3)).setBorder(false);
-//
-//    graph.addEdge(hEdge2, node1);
-//    graph.getEdgeData(graph.findEdge(hEdge2, node1)).setBorder(false);
-//    graph.addEdge(hEdge2, node4);
-//    graph.getEdgeData(graph.findEdge(hEdge2, node4)).setBorder(false);
-//    graph.addEdge(hEdge2, node3);
-//    graph.getEdgeData(graph.findEdge(hEdge2, node3)).setBorder(false);
+
 }

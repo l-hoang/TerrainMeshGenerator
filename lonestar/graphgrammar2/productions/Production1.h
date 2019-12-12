@@ -26,11 +26,8 @@ public:
     }
 
     void execute(GNode node, Graph &graph, galois::UserContext<GNode>& ctx)  {
-        auto nodeData = graph.getData(node);
+//        auto nodeData = graph.getData(node);
         const EdgeIterator &longestEdge = connManager.getLongestEdge(node, connManager.getEdges(node));
-//        const GNode &node1 = longestEdge->first();
-//        auto newNode = graph.createNode(NodeData{false, Coordinates{0.5,0.5,0}});
-        GNode node2 = graph.getEdgeDst(longestEdge);
         EdgeData &eData = graph.getEdgeData(longestEdge);
         auto pair = connManager.findSrc(eData);
         graph.removeEdge(pair.first, pair.second);
@@ -47,17 +44,6 @@ public:
             graph.getEdgeData(edge).setLength(sqrt(pow(nData.getCoords().getX(), 2) + pow(nData.getCoords().getY(), 2) + pow(
                     nData.getCoords().getZ(), 2)));
         }
-        
-
-//        GNode node12 = connManager.getEdgeSrc(longestEdge, node);
-//        graph.removeEdge(node1, longestEdge);
-//        graph.removeEdge(node2, longestEdge);
-//        for (GNode n : connManager.getNeighbours(node)) {
-//            graph.addEdge(n, newNode);
-//            graph.getEdgeData(graph.findEdge(node1, node2));
-//        }
-
-
         std::cout << "Execution of: " << (graph.getData(connManager.getNeighbours(node)[0])).getCoords().toString() << std::endl;
     }
 };

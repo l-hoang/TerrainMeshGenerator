@@ -3,6 +3,8 @@
 
 class Coordinates {
 private:
+    constexpr static const double EPSILON = 1e-8;
+
     double x;
     double y;
     double z;
@@ -40,9 +42,9 @@ public:
     }
 
     bool operator==(const Coordinates &rhs) const {
-        return abs(x - rhs.x) < 1e-8 &&
-               abs(y - rhs.y) < 1e-8 &&
-               abs(z - rhs.z) < 1e-8;
+        return abs(x - rhs.x) < EPSILON &&
+               abs(y - rhs.y) < EPSILON &&
+               abs(z - rhs.z) < EPSILON;
     }
 
     bool operator!=(const Coordinates &rhs) const {
