@@ -4,33 +4,42 @@
 static const double EPS = 1e-4;
 
 #include "../utils/ConnectivityManager.h"
+#include "../utils/utils.h"
 
 class Production1 {
 private:
     ConnectivityManager connManager;
+
+
+    int getEdgeToBreak(const std::vector<double> lengths, const std::vector<EdgeData> &data) const {
+        int result = -1;
+        for (int i = 0; i < 3; ++i) {
+            if (!less(lengths[i], lengths[(i+1)%3])  && !less(lengths[i], lengths[(i+2)%3])) {
+                result = i;
+                if (data[i].isBorder()) {
+                    return i;
+                }
+            }
+        }
+        return result;
+    }
+
+    int getNeutralVertex(int edgeToBreak) {
+        return (edgeToBreak + 2) % 3;
+    }
+
 public:
 
     explicit Production1(const ConnectivityManager &connManager) : connManager(connManager) {}
 
-    int getNeutralVertex(int edgeToBreak, std::vector<GNode> vertices, const std::vector<optional<EdgeIterator>>& edgesIters) {
-        return 0;
-    }
-
     bool execute(GNode interior, Graph &graph, galois::UserContext<GNode>& ctx)  {
         NodeData &nodeData = graph.getData(interior);
-        if (!nodeData.isHyperEdge) {
-            return false;
-        }
-        if (!nodeData.isToRefine()) {
-            return false;
-        }
-//        bool hanging = false;
-        bool hasHanging = connManager.hasHanging(interior, connManager.getEdges(interior));
-        if (hasHanging) {
+        const std::vector<GNode> &vertices = connManager.getNeighbours(interior);
+        if (!nodeData.isHyperEdge || !nodeData.isToRefine() ||
+                connManager.hasHanging(interior, connManager.getTriangleEdges(vertices))) {
             return false;
         }
 
-        const std::vector<GNode> &vertices = connManager.getNeighbours(interior);
         int counter = 0;
         for (auto vertex : vertices) {
             if (graph.getData(vertex).isHanging()) {
@@ -40,18 +49,17 @@ public:
         if (counter >= 2) {
             return false;
         }
-        std::vector<optional<EdgeIterator>> edgesIterators = connManager.getEdges(interior);
+        std::vector<optional<EdgeIterator>> edgesIterators = connManager.getTriangleEdges(vertices);
         std::vector<EdgeData> edgesData(3);
         std::vector<double> lengths(3);
         for (int i = 0; i < 3; ++i) {
             edgesData[i] = graph.getEdgeData(edgesIterators[i].get());
             lengths[i] = edgesData[i].getLength();
-
         }
 
         int edgeToBreak = getEdgeToBreak(lengths, edgesData);
         bool isBorder = edgesData[edgeToBreak].isBorder();
-        int neutralVertex = getNeutralVertex(edgeToBreak, vertices, edgesIterators);
+        int neutralVertex = getNeutralVertex(edgeToBreak);
 
         auto edgePair = connManager.findSrc(edgesData[edgeToBreak]);
         graph.removeEdge(edgePair.first, edgePair.second);
@@ -90,22 +98,9 @@ public:
         return true;
     }
 
-    int getEdgeToBreak(const std::vector<double> lengths, const std::vector<EdgeData> &data) const {
-        int result = -1;
-        for (int i = 0; i < 3; ++i) {
-            if (abs(lengths[i] - lengths[(i+1)%3]) < EPS && abs(lengths[i] - lengths[(i+2)%3]) < EPS) {
-                result = i;
-                if (data[i].isBorder()) {
-                    return i;
-                }
-            }
-        }
-        return result;
-    }
-
 //    void execute(GNode node, Graph &graph, galois::UserContext<GNode>& ctx)  {
 //        auto nodeData = graph.getData(node);
-//        const EdgeIterator &longestEdge = connManager.getLongestEdge(node, connManager.getEdges(node));
+//        const EdgeIterator &longestEdge = connManager.getLongestEdge(node, connManager.getTriangleEdges(node));
 //        EdgeData &eData = graph.getEdgeData(longestEdge);
 //        auto pair = connManager.findSrc(eData);
 //        graph.removeEdge(pair.first, pair.second);

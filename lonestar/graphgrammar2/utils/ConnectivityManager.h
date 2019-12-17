@@ -28,12 +28,10 @@ public:
         return nullptr;
     }
 
-    std::vector<optional<EdgeIterator>> getEdges(const GNode node) {
+    std::vector<optional<EdgeIterator>> getTriangleEdges(std::vector<GNode> vertices) {
         std::vector<optional<EdgeIterator>> edges;
-        auto vertices = getNeighbours(node);
         for (int i = 0; i<3;i++) {
-            auto vertex = vertices[i];
-            EdgeIterator edge = graph.findEdge(vertices[(i+1)%3], vertex);
+            EdgeIterator edge = graph.findEdge(vertices[i], vertices[(i+1)%3]);
             if (edge.base() == edge.end()) {
                 edges.emplace_back(optional<EdgeIterator>());
             } else {
@@ -70,6 +68,10 @@ public:
             }
         }
         return result;
+    }
+
+    Graph &getGraph() const {
+        return graph;
     }
 };
 

@@ -5,6 +5,7 @@
 #include "model/Graph.h"
 #include "productions/Production1.h"
 #include "utils/MyGraphFormatWriter.h"
+#include "utils/utils.h"
 
 
 static const char *name = "Mesh generator";
