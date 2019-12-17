@@ -35,9 +35,9 @@ int main(int argc, char **argv) {
 
     Production1 production1{graph};
     galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto& ctx) {
-        if (production1.isPossible(node, graph)) {
+//        if (production1.isPossible(node, graph, ctx)) {
             production1.execute(node, graph, ctx);
-        }
+//        }
     });
 
     writer.writeToFile(graph, "graph.mgf");
