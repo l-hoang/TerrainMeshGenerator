@@ -48,7 +48,7 @@ public:
         })->get();
     }
 
-    bool hasHanging(GNode node, const std::vector<optional<EdgeIterator>> &edges) {
+    bool hasBrokenEdge(const std::vector<optional<EdgeIterator>> &edges) const {
         for (const optional<EdgeIterator> &edge : edges) {
             if (!edge.is_initialized()) {
                 return true;
@@ -57,7 +57,7 @@ public:
         return false;
     }
 
-    std::pair<GNode, EdgeIterator> findSrc(EdgeData edge) {
+    std::pair<GNode, EdgeIterator> findSrc(EdgeData edge) const {
         std::pair<GNode, EdgeIterator> result;
         for (auto n : graph) {
             for (const auto &e : graph.edges(n)) {

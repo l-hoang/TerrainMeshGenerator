@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     Production1 production1{graph};
     galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto& ctx) {
 //        if (production1.isPossible(node, graph, ctx)) {
-            production1.execute(node, graph, ctx);
+            production1.execute(node, ctx);
 //        }
     });
 
@@ -75,7 +75,7 @@ void generateSampleGraph(Graph &graph) {
     graph.getEdgeData(graph.findEdge(node3, node4)).setMiddlePoint(Coordinates{1,0.5,0});
     graph.getEdgeData(graph.findEdge(node3, node4)).setLength(1);
     graph.addEdge(node1, node3);
-    graph.getEdgeData(graph.findEdge(node1, node3)).setBorder(false);
+    graph.getEdgeData(graph.findEdge(node1, node3)).setBorder(true);
     graph.getEdgeData(graph.findEdge(node1, node3)).setMiddlePoint(Coordinates{0.5,0,0});
     graph.getEdgeData(graph.findEdge(node1, node3)).setLength(1);
     graph.addEdge(node4, node1);
@@ -87,8 +87,8 @@ void generateSampleGraph(Graph &graph) {
     graph.getEdgeData(graph.findEdge(hEdge1, node1)).setBorder(false);
     graph.addEdge(hEdge1, node2);
     graph.getEdgeData(graph.findEdge(hEdge1, node2)).setBorder(false);
-    graph.addEdge(hEdge1, node3);
-    graph.getEdgeData(graph.findEdge(hEdge1, node3)).setBorder(false);
+    graph.addEdge(hEdge1, node4);
+    graph.getEdgeData(graph.findEdge(hEdge1, node4)).setBorder(false);
 
     graph.addEdge(hEdge2, node1);
     graph.getEdgeData(graph.findEdge(hEdge2, node1)).setBorder(false);
