@@ -1,6 +1,8 @@
 #ifndef GALOIS_UTILS_H
 #define GALOIS_UTILS_H
 
+static const double EPS = 1e-4;
+
 bool equals(double a, double b) {
     return fabs(a - b) < EPS;
 }

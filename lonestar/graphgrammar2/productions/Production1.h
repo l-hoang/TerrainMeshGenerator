@@ -1,8 +1,6 @@
 #ifndef GALOIS_PRODUCTION1_H
 #define GALOIS_PRODUCTION1_H
 
-static const double EPS = 1e-4;
-
 #include "../utils/ConnectivityManager.h"
 #include "../utils/utils.h"
 
@@ -14,13 +12,12 @@ private:
         return nodeData.isHyperEdge && nodeData.isToRefine();
     }
 
-    bool checkComplexApplicabilityCondition(const std::vector<GNode> &vertices,
-                                            const std::vector<optional<EdgeIterator>> &edgesIterators) const {
-        return !connManager.hasBrokenEdge(edgesIterators) /*|| !hasMultipleHangingVertices(vertices)*/;
+    bool checkComplexApplicabilityCondition(const std::vector<optional<EdgeIterator>> &edgesIterators) const {
+        return !connManager.hasBrokenEdge(edgesIterators);
     }
 
     int getEdgeToBreak(const std::vector<double> &lengths, const std::vector<EdgeData> &edgesData,
-                       const std::vector<NodeData>& verticesData) const {
+                       const std::vector<NodeData> &verticesData) const {
         std::vector<int> longestEdges = getLongestEdges(lengths);
         for (int longest : longestEdges) {
             if (edgesData[longest].isBorder()) {
@@ -45,7 +42,17 @@ private:
         return longestEdges;
     }
 
-    void breakElement(int edgeToBreak, const std::vector<EdgeData> &edgesData, const std::vector<GNode> &vertices,
+    GNode createInterior(GNode *node1, GNode *node2, GNode *node3, galois::UserContext<GNode> &ctx) const {
+        NodeData firstInteriorData = NodeData{true, false};
+        auto firstInterior = connManager.createNode(firstInteriorData, ctx);
+        connManager.getGraph().addEdge(firstInterior, *node1);
+        connManager.getGraph().addEdge(firstInterior, *node2);
+        connManager.getGraph().addEdge(firstInterior, *node3);
+        return firstInterior;
+    }
+
+    void breakElement(int edgeToBreak, GNode &interior, const std::vector<EdgeData> &edgesData,
+                      const std::vector<GNode> &vertices,
                       const std::vector<NodeData> &verticesData, galois::UserContext<GNode> &ctx) const {
         Graph &graph = connManager.getGraph();
         bool breakingOnBorder = edgesData[edgeToBreak].isBorder();
@@ -54,7 +61,7 @@ private:
         auto edgePair = connManager.findSrc(edgesData[edgeToBreak]);
         graph.removeEdge(edgePair.first, edgePair.second);
         NodeData newNodeData = NodeData{false, edgesData[edgeToBreak].getMiddlePoint(), true};
-        auto newNode = graph.createNode(newNodeData);
+        GNode newNode = graph.createNode(newNodeData);
         graph.addNode(newNode);
         ctx.push(newNode);
         for (int i = 0; i < 3; ++i) {
@@ -69,25 +76,54 @@ private:
                     sqrt(pow(newNodeData.getCoords().getX(), 2) + pow(newNodeData.getCoords().getY(), 2) + pow(
                             newNodeData.getCoords().getZ(), 2)));
         }
-        const NodeData &firstInteriorData = NodeData{true, false}; //Refactor me
-        const NodeData &secondInteriorData = NodeData{true, false};
-        auto firstInterior = graph.createNode(firstInteriorData);
-        auto secondInterior = graph.createNode(secondInteriorData);
-        graph.addNode(firstInterior);
-        graph.addNode(secondInterior);
-        ctx.push(firstInterior);
-        ctx.push(secondInterior);
-        graph.addEdge(firstInterior, newNode);
-        graph.addEdge(secondInterior, newNode);
-        graph.addEdge(firstInterior, vertices[neutralVertex]);
-        graph.addEdge(secondInterior, vertices[neutralVertex]);
+//        NodeData secondInteriorData = NodeData{true, false};
+//        auto secondInterior = connManager.createNode(secondInteriorData, ctx);
+//        GNode firstInterior;
+        NodeData firstInteriorData = NodeData{true, true};
+        auto firstInterior = connManager.createNode(firstInteriorData, ctx);
+//        std::vector<GNode> vertices2;
+//        for (Graph::edge_iterator ii = graph.edge_begin(interior), ee = graph.edge_end(interior); ii != ee; ++ii) {
+//            Graph::edge_iterator ii = graph.edge_begin(interior);
+//            GNode v1 = graph.getEdgeDst(ii++);
+//            GNode v2 = graph.getEdgeDst(ii++);
+//            GNode v3 = graph.getEdgeDst(ii++);
+//        }
+        connManager.getGraph().addEdge(firstInterior, newNode);
+        connManager.getGraph().addEdge(firstInterior, vertices[neutralVertex]);
+//        connManager.getGraph().addEdge(firstInterior, vertices[0]);
+//        connManager.getGraph().addEdge(firstInterior, vertices2[(edgeToBreak + 1) % 3]);
+
+        NodeData secondInteriorData = NodeData{true, true};
+        auto secondInterior = connManager.createNode(secondInteriorData, ctx);
+
+        connManager.getGraph().addEdge(secondInterior, newNode);
+        connManager.getGraph().addEdge(secondInterior, vertices[neutralVertex]);
+//        connManager.getGraph().addEdge(secondInterior, connManager.getNeighbourN(interior, neutralVertex));
+//        connManager.getGraph().addEdge(secondInterior, vertices2[(edgeToBreak + 2) % 3]);
+
+//        GNode interior1 = createInterior(&newNode, vertices[neutralVertex], vertices[(edgeToBreak + 1) % 3], ctx);
+//        graph.addEdge(secondInterior, newNode);
+//        graph.addEdge(secondInterior, vertices[neutralVertex]);
         bool switc = false;
         for (int j = 0; j < 3; ++j) {
             if (j != neutralVertex) {
                 graph.addEdge(!switc ? firstInterior : secondInterior, vertices[j]);
+                const Coordinates &coords = (newNodeData.getCoords() + verticesData[neutralVertex].getCoords() +
+                                             verticesData[j].getCoords()) / 3.;
+                if (!switc) {
+                    firstInteriorData.setCoords(coords);
+                } else {
+                    secondInteriorData.setCoords(coords);
+                }
                 switc = true;
             }
         }
+
+        graph.removeNode(interior);
+
+
+//        NodeData testD = NodeData{true, false};
+//        connManager.createNode(testD, ctx);
     }
 
     std::pair<int, int> getEdgeVertices(int edge) const {
@@ -96,6 +132,14 @@ private:
 
     int getNeutralVertex(int edgeToBreak) const {
         return (edgeToBreak + 2) % 3;
+    }
+
+    void logg(std::vector<NodeData> verticesData) {
+        std::cout << "neighbours: (";
+        for (auto vertex : verticesData) {
+            std::cout << vertex.getCoords().toString() + ", ";
+        }
+        std::cout << ") ";
     }
 
 public:
@@ -107,13 +151,14 @@ public:
         NodeData &nodeData = graph.getData(interior);
 
         if (!checkBasicApplicabilityCondition(nodeData)) {
+            std::cout << "P1 " << nodeData.getCoords().toString() + " ";
             return false;
         }
 
         const std::vector<GNode> &vertices = connManager.getNeighbours(interior);
         const std::vector<optional<EdgeIterator>> &edgesIterators = connManager.getTriangleEdges(vertices);
 
-        if (!checkComplexApplicabilityCondition(vertices, edgesIterators)) {
+        if (!checkComplexApplicabilityCondition(edgesIterators)) {
             return false;
         }
 
@@ -126,12 +171,15 @@ public:
             verticesData.push_back(graph.getData(vertices[i]));
         }
 
+        logg(verticesData);
+
         int edgeToBreak = getEdgeToBreak(lengths, edgesData, verticesData);
         if (edgeToBreak == -1) {
             return false;
         }
 
-        breakElement(edgeToBreak, edgesData, vertices, verticesData, ctx);
+        breakElement(edgeToBreak, interior, edgesData, vertices, verticesData, ctx);
+        std::cout << "P1 executed ";
 
         return true;
     }

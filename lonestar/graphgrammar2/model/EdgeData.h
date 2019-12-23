@@ -10,7 +10,7 @@ private:
     Coordinates middlePoint;
 
 public:
-    EdgeData() {}
+    EdgeData() = default;
 
     EdgeData(bool border, double length, Coordinates middlePoint) : border(border), length(length),
                                                                     middlePoint(middlePoint) {}
@@ -39,8 +39,8 @@ public:
         return middlePoint;
     }
 
-    void setMiddlePoint(const Coordinates &middlePoint) {
-        EdgeData::middlePoint = middlePoint;
+    void setMiddlePoint(const Coordinates &coordinates) {
+        EdgeData::middlePoint.setXYZ(coordinates.getX(), coordinates.getY(), coordinates.getZ());
     }
 };
 

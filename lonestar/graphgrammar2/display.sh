@@ -1,3 +1,3 @@
 #!/bin/bash
 
-java -jar lonestar/graphgrammar2/terrain-generator-0.0.1-all.jar "$1"
+java -jar graph-visualizer-0.2-all.jar "$1"
