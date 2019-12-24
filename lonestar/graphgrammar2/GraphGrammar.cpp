@@ -17,6 +17,8 @@ void generateSampleGraph(Graph &graph);
 
 void generateSampleGraph2(Graph &graph);
 
+void afterStep(int i, Graph &graph);
+
 int main(int argc, char **argv) {
     galois::SharedMemSys G;
     LonestarStart(argc, argv, name, desc, url);//---------
@@ -45,20 +47,32 @@ int main(int argc, char **argv) {
         if (!graph.containsNode(node, galois::MethodFlag::WRITE)){
             return;
         }
-        std::cout << i++ << ": ";
-        if (!production1.execute(node, ctx)) {
-            production2.execute(node, ctx);
+        if (!node->getData().isHyperEdge()) {
+            return;
         }
-        std::cout << std::endl;
-        auto path = std::string("step") + std::to_string(i - 1) + ".mgf";
-        MyGraphFormatWriter::writeToFile(graph, path);
-        system((std::string("./display.sh ") + path).c_str());
+        std::cout << i++ << ": ";
+        if (production1.execute(node, ctx)) {
+            afterStep(i, graph);
+            return;
+        }
+        if (production2.execute(node, ctx)) {
+            afterStep(i, graph);
+            return;
+        }
+
     });
 
-    MyGraphFormatWriter::writeToFile(graph, "graph.mgf");
-    system("./display.sh graph.mgf");
+    MyGraphFormatWriter::writeToFile(graph, "out/graph.mgf");
+    system("./display.sh out/graph.mgf");
 
     return 0;
+}
+
+void afterStep(int i, Graph &graph) {
+    auto path = std::string("out/step") + std::to_string(i - 1) + ".mgf";
+    MyGraphFormatWriter::writeToFile(graph, path);
+    system((std::string("./display.sh ") + path).c_str());
+    std::cout << std::endl;
 }
 
 void generateSampleGraph(Graph &graph) {

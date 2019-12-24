@@ -44,6 +44,16 @@ private:
         }
     }
 
+    static optional<Edge> findEdge(const string &first, const string &second, const set<Edge> &edges) {
+        for (auto edge : edges) {
+            if ((std::get<0>(edge) == first && std::get<1>(edge) == second) ||
+                (std::get<0>(edge) == second && std::get<1>(edge) == first)) {
+                return galois::optional<Edge>(edge);
+            }
+        }
+        return galois::optional<Edge>();
+    }
+
     static string getNodeId(set<Node> &nodes, int &nodesIter, NodeData &data) {
         return getNodeId(nodes, nodesIter, data, optional<set<Node>>());
     }
@@ -60,26 +70,16 @@ private:
             }
         }
         nodes.emplace(Node(nodesIter, data));
-        return (data.isHyperEdge ? "h" : "n") + std::to_string(nodesIter++);
+        return (data.isHyperEdge() ? "h" : "n") + std::to_string(nodesIter++);
     }
 
     static optional<string> findNode(const NodeData &node, const set<Node> &nodesSet) {
         for (auto pair : nodesSet) {
             if (pair.second == node) {
-                return optional<string>((node.isHyperEdge ? "h" : "n") + std::__cxx11::to_string(pair.first));
+                return optional<string>((node.isHyperEdge() ? "h" : "n") + std::__cxx11::to_string(pair.first));
             }
         }
         return optional<string>();
-    }
-
-    static optional<Edge> findEdge(const string &first, const string &second, const set<Edge> &edges) {
-        for (auto edge : edges) {
-            if ((std::get<0>(edge) == first && std::get<1>(edge) == second) ||
-                (std::get<0>(edge) == second && std::get<1>(edge) == first)) {
-                return galois::optional<Edge>(edge);
-            }
-        }
-        return galois::optional<Edge>();
     }
 
 
@@ -92,12 +92,12 @@ public:
         int interiorsIter = 0;
         for (auto node: graph) {
             NodeData &data = graph.getData(node);
-            if (!data.isHyperEdge) {
+            if (!data.isHyperEdge()) {
                 string firstNodeId = getNodeId(vertices, nodesIter, data);
                 for (const EdgeIterator &e : graph.edges(node)) {
                     GNode dstNode = graph.getEdgeDst(e);
                     NodeData dstNodeData = graph.getData(dstNode);
-                    if (!dstNodeData.isHyperEdge) {
+                    if (!dstNodeData.isHyperEdge()) {
                         string secondNodeId = getNodeId(vertices, nodesIter, dstNodeData);
                         addEdge(edges, firstNodeId, secondNodeId,
                                 graph.getEdgeData(graph.findEdge(node, dstNode)).isBorder());

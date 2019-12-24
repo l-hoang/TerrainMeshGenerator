@@ -6,26 +6,31 @@
 
 class NodeData {
 private:
+    bool hyperEdge;
     Coordinates coords;
     bool toRefine;
     bool hanging;
 public:
-    bool isHyperEdge;
 
-    NodeData(bool isHyperEdge, const Coordinates &coords, bool hanging) : coords(coords), isHyperEdge(isHyperEdge),
-                                                                          hanging(hanging) {}
+    NodeData(bool isHyperEdge, const Coordinates &coords, bool hanging) : hyperEdge(isHyperEdge), coords(),
+                                                                          toRefine(false), hanging(hanging) {
+        setCoords(coords);
+    }
 
-    NodeData(bool isHyperEdge, bool toRefine) : toRefine(toRefine), isHyperEdge(isHyperEdge), coords() {}
+    NodeData(bool isHyperEdge, bool toRefine) : hyperEdge(isHyperEdge), coords(), toRefine(toRefine), hanging(false) {}
 
-    NodeData(bool isHyperEdge, bool toRefine, Coordinates coords) : toRefine(toRefine), isHyperEdge(isHyperEdge),
-                                                                    coords(coords) {}
+    NodeData(bool isHyperEdge, bool toRefine, Coordinates coords) : hyperEdge(isHyperEdge), coords(),
+                                                                    toRefine(toRefine),
+                                                                    hanging(false) {
+        setCoords(coords);
+    }
 
     Coordinates getCoords() const {
         return coords;
     }
 
-    void setCoords(const Coordinates &coords) {
-        NodeData::coords.setXYZ(coords.getX(), coords.getY(), coords.getZ());
+    void setCoords(const Coordinates &coordinates) {
+        NodeData::coords.setXYZ(coordinates.getX(), coordinates.getY(), coordinates.getZ());
     }
 
     void setCoords(const double x, const double y, const double z) {
@@ -36,22 +41,26 @@ public:
         return toRefine;
     }
 
-    void setToRefine(bool toRefine) {
-        NodeData::toRefine = toRefine;
+    void setToRefine(bool refine) {
+        NodeData::toRefine = refine;
     }
 
     bool isHanging() const {
         return hanging;
     }
 
-    void setHanging(bool hanging) {
-        NodeData::hanging = hanging;
+    void setHanging(bool hangingNode) {
+        NodeData::hanging = hangingNode;
+    }
+
+    bool isHyperEdge() const {
+        return hyperEdge;
     }
 
     bool operator==(const NodeData &rhs) const {
-        return isHyperEdge == rhs.isHyperEdge &&
+        return hyperEdge == rhs.hyperEdge &&
                coords == rhs.coords &&
-               (isHyperEdge ? toRefine == rhs.toRefine : hanging == rhs.hanging);
+               (hyperEdge ? toRefine == rhs.toRefine : hanging == rhs.hanging);
     }
 
     bool operator!=(const NodeData &rhs) const {
@@ -59,15 +68,15 @@ public:
     }
 
     bool operator<(const NodeData &rhs) const {
-        if (isHyperEdge < rhs.isHyperEdge)
+        if (hyperEdge < rhs.hyperEdge)
             return true;
-        if (rhs.isHyperEdge < isHyperEdge)
+        if (rhs.hyperEdge < hyperEdge)
             return false;
         if (coords < rhs.coords)
             return true;
         if (rhs.coords < coords)
             return false;
-        if (isHyperEdge) {
+        if (hyperEdge) {
             return toRefine < rhs.toRefine;
         } else {
             return hanging < rhs.hanging;

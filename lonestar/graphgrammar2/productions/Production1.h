@@ -9,7 +9,7 @@ private:
     ConnectivityManager connManager;
 
     bool checkBasicApplicabilityCondition(const NodeData &nodeData) const {
-        return nodeData.isHyperEdge && nodeData.isToRefine();
+        return nodeData.isHyperEdge() && nodeData.isToRefine();
     }
 
     bool checkComplexApplicabilityCondition(const std::vector<optional<EdgeIterator>> &edgesIterators) const {
@@ -69,9 +69,9 @@ private:
             auto edge = graph.addEdge(newNode, vertices[i]);
             graph.getEdgeData(edge).setBorder(i != neutralVertex ? breakingOnBorder : false);
             graph.getEdgeData(edge).setMiddlePoint(
-                    Coordinates{(newNodeData.getCoords().getX() + vertexData.getCoords().getX()) / 2.,
-                                (newNodeData.getCoords().getY() + vertexData.getCoords().getY()) / 2.,
-                                (newNodeData.getCoords().getZ() + vertexData.getCoords().getZ()) / 2.});
+                    (newNodeData.getCoords().getX() + vertexData.getCoords().getX()) / 2.,
+                    (newNodeData.getCoords().getY() + vertexData.getCoords().getY()) / 2.,
+                    (newNodeData.getCoords().getZ() + vertexData.getCoords().getZ()) / 2.);
             graph.getEdgeData(edge).setLength(
                     sqrt(pow(newNodeData.getCoords().getX(), 2) + pow(newNodeData.getCoords().getY(), 2) + pow(
                             newNodeData.getCoords().getZ(), 2)));
@@ -111,9 +111,9 @@ private:
                 const Coordinates &coords = (newNodeData.getCoords() + verticesData[neutralVertex].getCoords() +
                                              verticesData[j].getCoords()) / 3.;
                 if (!switc) {
-                    firstInteriorData.setCoords(coords);
+                    firstInterior->getData().setCoords(coords);
                 } else {
-                    secondInteriorData.setCoords(coords);
+                    secondInterior->getData().setCoords(coords);
                 }
                 switc = true;
             }
@@ -134,8 +134,8 @@ private:
         return (edgeToBreak + 2) % 3;
     }
 
-    void logg(std::vector<NodeData> verticesData) {
-        std::cout << "neighbours: (";
+    static void logg(const NodeData &interiorData, const std::vector<NodeData>& verticesData) {
+        std::cout << "interior: (" << interiorData.getCoords().toString() << "), neighbours: (";
         for (auto vertex : verticesData) {
             std::cout << vertex.getCoords().toString() + ", ";
         }
@@ -148,10 +148,9 @@ public:
 
     bool execute(GNode interior, galois::UserContext<GNode> &ctx) {
         Graph &graph = connManager.getGraph();
-        NodeData &nodeData = graph.getData(interior);
+        NodeData &interiorData = interior->getData();
 
-        if (!checkBasicApplicabilityCondition(nodeData)) {
-            std::cout << "P1 " << nodeData.getCoords().toString() + " ";
+        if (!checkBasicApplicabilityCondition(interiorData)) {
             return false;
         }
 
@@ -171,7 +170,7 @@ public:
             verticesData.push_back(graph.getData(vertices[i]));
         }
 
-        logg(verticesData);
+        logg(interiorData, verticesData);
 
         int edgeToBreak = getEdgeToBreak(lengths, edgesData, verticesData);
         if (edgeToBreak == -1) {
@@ -183,6 +182,8 @@ public:
 
         return true;
     }
+
+
 };
 
 

@@ -1,8 +1,6 @@
 #ifndef GALOIS_PRODUCTION2_H
 #define GALOIS_PRODUCTION2_H
 
-//static const double EPS = 1e-4;
-
 #include "../utils/ConnectivityManager.h"
 #include "../utils/utils.h"
 
@@ -11,7 +9,7 @@ private:
     ConnectivityManager connManager;
 
     bool checkBasicApplicabilityCondition(const NodeData &nodeData) const {
-        return nodeData.isHyperEdge;
+        return nodeData.isHyperEdge();
     }
 
     bool checkComplexApplicabilityCondition(const std::vector<optional<EdgeIterator>> &edgesIterators) const {
@@ -28,7 +26,7 @@ private:
     }
 
     bool checkIfBrokenEdgeIsTheLongest(int brokenEdge, const std::vector<optional<EdgeIterator>> &edgesIterators,
-                                       const std::vector<GNode> &vertices) {
+                                       const std::vector<GNode> &vertices, std::vector<NodeData> verticesData) {
         std::vector<double> lengths(4);
         Graph &graph = connManager.getGraph();
         for (int i = 0, j = 0; i < 3; ++i) {
@@ -38,7 +36,8 @@ private:
                 const std::pair<int, int> &brokenEdgeVertices = getEdgeVertices(brokenEdge);
                 GNode &hangingNode = connManager.findNodeBetween(vertices[brokenEdgeVertices.first],
                                                                  vertices[brokenEdgeVertices.second],
-                                                                 Coordinates()).get();
+                                                                 verticesData[getNeutralVertex(brokenEdge)]
+                                                                         .getCoords()).get();
                 lengths[2] = graph.getEdgeData(
                         graph.findEdge(vertices[brokenEdgeVertices.first], hangingNode)).getLength();
                 lengths[3] = graph.getEdgeData(
@@ -143,10 +142,10 @@ private:
             if (j != neutralVertex) {
                 graph.addEdge(!switc ? firstInterior : secondInterior, vertices[j]);
                 if (!switc) {
-                    firstInteriorData.setCoords((hNodeData.getCoords() + verticesData[neutralVertex].getCoords() +
+                    firstInterior->getData().setCoords((hNodeData.getCoords() + verticesData[neutralVertex].getCoords() +
                                                  verticesData[j].getCoords()) / 3.);
                 } else {
-                    secondInteriorData.setCoords((hNodeData.getCoords() + verticesData[neutralVertex].getCoords() +
+                    secondInterior->getData().setCoords((hNodeData.getCoords() + verticesData[neutralVertex].getCoords() +
                                                   verticesData[j].getCoords()) / 3.);
                 }
                 switc = true;
@@ -166,8 +165,8 @@ private:
         return (edgeToBreak + 2) % 3;
     }
 
-    void logg(const std::vector<NodeData> &verticesData) {
-        std::cout << "neighbours: (";
+    static void logg(const NodeData &interiorData, const std::vector<NodeData>& verticesData) {
+        std::cout << "interior: (" << interiorData.getCoords().toString() << "), neighbours: (";
         for (auto vertex : verticesData) {
             std::cout << vertex.getCoords().toString() + ", ";
         }
@@ -180,10 +179,9 @@ public:
 
     bool execute(GNode interior, galois::UserContext<GNode> &ctx) {
         Graph &graph = connManager.getGraph();
-        NodeData &nodeData = graph.getData(interior);
+        NodeData &interiorData = graph.getData(interior);
 
-        if (!checkBasicApplicabilityCondition(nodeData)) {
-            std::cout << "P2 " << nodeData.getCoords().toString() + " ";
+        if (!checkBasicApplicabilityCondition(interiorData)) {
             return false;
         }
 
@@ -199,12 +197,12 @@ public:
             verticesData.push_back(graph.getData(vertices[i]));
         }
 
-        logg(verticesData);
+        logg(interiorData, verticesData);
 
         int brokenEdge = getBrokenEdge(edgesIterators);
         assert(brokenEdge != -1);
 
-        if (!checkIfBrokenEdgeIsTheLongest(brokenEdge, edgesIterators, vertices)) {
+        if (!checkIfBrokenEdgeIsTheLongest(brokenEdge, edgesIterators, vertices, verticesData)) {
             return false;
         }
         const std::pair<int, int> &brokenEdgeVertices = getEdgeVertices(brokenEdge);
@@ -216,6 +214,7 @@ public:
         std::cout << "P2 executed ";
         return true;
     }
+
 };
 
 

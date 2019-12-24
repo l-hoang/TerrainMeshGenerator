@@ -13,7 +13,7 @@ private:
 public:
     Coordinates(double x, double y, double z) : x(x), y(y), z(z) {}
 
-    Coordinates() {}
+    Coordinates() = default;
 
     double getX() const {
         return x;
@@ -46,7 +46,7 @@ public:
     }
 
     std::string toString() const {
-        return  std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(z);
+        return std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(z);
     }
 
     Coordinates operator+(const Coordinates &coords) const {
@@ -54,13 +54,13 @@ public:
     }
 
     Coordinates operator/(double div) const {
-        return Coordinates{x/div, y/div, z/div};
+        return Coordinates{x / div, y / div, z / div};
     }
 
     bool operator==(const Coordinates &rhs) const {
-        return abs(x - rhs.x) < EPS &&
-               abs(y - rhs.y) < EPS &&
-               abs(z - rhs.z) < EPS;
+        return equals(x, rhs.x) &&
+               equals(y, rhs.y) &&
+               equals(z, rhs.z);
     }
 
     bool operator!=(const Coordinates &rhs) const {
@@ -91,4 +91,5 @@ public:
         return !(*this < rhs);
     }
 };
+
 #endif //GALOIS_COORDINATES_H
