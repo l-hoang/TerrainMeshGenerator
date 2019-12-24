@@ -94,13 +94,14 @@ public:
         return result;
     }
 
-    optional<GNode> findNodeBetween(GNode node1, GNode node2, Coordinates notThere) {
+    optional<GNode> findNodeBetween(const GNode &node1, const GNode &node2) const {
+        Coordinates lookThere = (node1->getData().getCoords() + node2->getData().getCoords()) / 2.;
          std::vector<GNode> neighbours1 = getNeighbours(node1);
          std::vector<GNode> neighbours2 = getNeighbours(node2);
         for (GNode &iNode : neighbours1) {
             auto iNodeData = graph.getData(iNode);
             for (GNode &jNode : neighbours2) {
-                if (iNodeData.getCoords() == graph.getData(jNode).getCoords() && iNodeData.getCoords() != notThere) {
+                if (iNodeData.getCoords() == graph.getData(jNode).getCoords() && iNodeData.getCoords() == lookThere) {
                     return optional<GNode>(iNode);
                 }
             }

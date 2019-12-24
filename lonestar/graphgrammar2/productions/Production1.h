@@ -72,9 +72,7 @@ private:
                     (newNodeData.getCoords().getX() + vertexData.getCoords().getX()) / 2.,
                     (newNodeData.getCoords().getY() + vertexData.getCoords().getY()) / 2.,
                     (newNodeData.getCoords().getZ() + vertexData.getCoords().getZ()) / 2.);
-            graph.getEdgeData(edge).setLength(
-                    sqrt(pow(newNodeData.getCoords().getX(), 2) + pow(newNodeData.getCoords().getY(), 2) + pow(
-                            newNodeData.getCoords().getZ(), 2)));
+            graph.getEdgeData(edge).setLength(newNodeData.getCoords().dist(vertexData.getCoords()));
         }
 //        NodeData secondInteriorData = NodeData{true, false};
 //        auto secondInterior = connManager.createNode(secondInteriorData, ctx);
@@ -134,7 +132,7 @@ private:
         return (edgeToBreak + 2) % 3;
     }
 
-    static void logg(const NodeData &interiorData, const std::vector<NodeData>& verticesData) {
+    static void logg(const NodeData &interiorData, const std::vector<NodeData> &verticesData) {
         std::cout << "interior: (" << interiorData.getCoords().toString() << "), neighbours: (";
         for (auto vertex : verticesData) {
             std::cout << vertex.getCoords().toString() + ", ";

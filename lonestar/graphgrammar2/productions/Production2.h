@@ -35,9 +35,7 @@ private:
             } else {
                 const std::pair<int, int> &brokenEdgeVertices = getEdgeVertices(brokenEdge);
                 GNode &hangingNode = connManager.findNodeBetween(vertices[brokenEdgeVertices.first],
-                                                                 vertices[brokenEdgeVertices.second],
-                                                                 verticesData[getNeutralVertex(brokenEdge)]
-                                                                         .getCoords()).get();
+                                                                 vertices[brokenEdgeVertices.second]).get();
                 lengths[2] = graph.getEdgeData(
                         graph.findEdge(vertices[brokenEdgeVertices.first], hangingNode)).getLength();
                 lengths[3] = graph.getEdgeData(
@@ -73,10 +71,11 @@ private:
         NodeData &hNodeData = graph.getData(hangingNode);
 
 
-        const EdgeIterator &newEdge = graph.addEdge(hangingNode, vertices[getNeutralVertex(edgeToBreak)]);
+        const EdgeIterator &newEdge = graph.addEdge(hangingNode, vertices[neutralVertex]);
         graph.getEdgeData(newEdge).setBorder(false);
+        graph.getEdgeData(newEdge).setLength(hNodeData.getCoords().dist(verticesData[neutralVertex].getCoords()));
         graph.getEdgeData(newEdge).setMiddlePoint(
-                (hNodeData.getCoords() + verticesData[getNeutralVertex(edgeToBreak)].getCoords()) / 2);
+                (hNodeData.getCoords() + verticesData[neutralVertex].getCoords()) / 2);
 
 //        for (int i = 0; i < 3; ++i) {
 //            auto vertexData = verticesData[i];
@@ -142,11 +141,13 @@ private:
             if (j != neutralVertex) {
                 graph.addEdge(!switc ? firstInterior : secondInterior, vertices[j]);
                 if (!switc) {
-                    firstInterior->getData().setCoords((hNodeData.getCoords() + verticesData[neutralVertex].getCoords() +
-                                                 verticesData[j].getCoords()) / 3.);
+                    firstInterior->getData().setCoords(
+                            (hNodeData.getCoords() + verticesData[neutralVertex].getCoords() +
+                             verticesData[j].getCoords()) / 3.);
                 } else {
-                    secondInterior->getData().setCoords((hNodeData.getCoords() + verticesData[neutralVertex].getCoords() +
-                                                  verticesData[j].getCoords()) / 3.);
+                    secondInterior->getData().setCoords(
+                            (hNodeData.getCoords() + verticesData[neutralVertex].getCoords() +
+                             verticesData[j].getCoords()) / 3.);
                 }
                 switc = true;
             }
@@ -165,7 +166,7 @@ private:
         return (edgeToBreak + 2) % 3;
     }
 
-    static void logg(const NodeData &interiorData, const std::vector<NodeData>& verticesData) {
+    static void logg(const NodeData &interiorData, const std::vector<NodeData> &verticesData) {
         std::cout << "interior: (" << interiorData.getCoords().toString() << "), neighbours: (";
         for (auto vertex : verticesData) {
             std::cout << vertex.getCoords().toString() + ", ";
@@ -207,8 +208,7 @@ public:
         }
         const std::pair<int, int> &brokenEdgeVertices = getEdgeVertices(brokenEdge);
         GNode &hangingNode = connManager.findNodeBetween(vertices[brokenEdgeVertices.first],
-                                                         vertices[brokenEdgeVertices.second],
-                                                         verticesData[getNeutralVertex(brokenEdge)].getCoords()).get();
+                                                         vertices[brokenEdgeVertices.second]).get();
 
         breakElement(brokenEdge, hangingNode, interior, vertices, verticesData, ctx);
         std::cout << "P2 executed ";

@@ -6,14 +6,13 @@
 
 class Coordinates {
 private:
-
     double x;
     double y;
     double z;
 public:
-    Coordinates(double x, double y, double z) : x(x), y(y), z(z) {}
-
     Coordinates() = default;
+
+    Coordinates(double x, double y, double z) : x(x), y(y), z(z) {}
 
     double getX() const {
         return x;
@@ -49,12 +48,24 @@ public:
         return std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(z);
     }
 
-    Coordinates operator+(const Coordinates &coords) const {
-        return Coordinates{x + coords.x, y + coords.y, z + coords.z};
+    double dist(const Coordinates &rhs) const {
+        return sqrt(pow(x - rhs.x, 2) + pow(y - rhs.y, 2) + pow(z - rhs.z, 2));
     }
 
-    Coordinates operator/(double div) const {
-        return Coordinates{x / div, y / div, z / div};
+    Coordinates operator+(const Coordinates &rhs) const {
+        return Coordinates{x + rhs.x, y + rhs.y, z + rhs.z};
+    }
+
+    Coordinates operator-(const Coordinates &rhs) const {
+        return Coordinates{x - rhs.x, y - rhs.y, z - rhs.z};
+    }
+
+    Coordinates operator*(double rhs) const {
+        return Coordinates{x * rhs, y * rhs, z * rhs};
+    }
+
+    Coordinates operator/(double rhs) const {
+        return Coordinates{x / rhs, y / rhs, z / rhs};
     }
 
     bool operator==(const Coordinates &rhs) const {
