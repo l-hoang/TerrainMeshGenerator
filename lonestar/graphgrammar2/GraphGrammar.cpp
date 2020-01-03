@@ -3,6 +3,7 @@
 #include "model/EdgeData.h"
 #include "model/NodeData.h"
 #include "model/Graph.h"
+#include "productions/Production0.h"
 #include "productions/Production1.h"
 #include "productions/Production2.h"
 #include "utils/MyGraphFormatWriter.h"
@@ -37,30 +38,48 @@ int main(int argc, char **argv) {
     galois::reportPageAlloc("MeminfoPre2");
 
 
+    Production0 production0;
     Production1 production1{graph};
     Production2 production2{graph};
     int i = 0;
-    galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto &ctx) {
-        if (i>18) {
-            return;
-        }
-        if (!graph.containsNode(node, galois::MethodFlag::WRITE)){
-            return;
-        }
-        if (!node->getData().isHyperEdge()) {
-            return;
-        }
-        std::cout << i++ << ": ";
-        if (production1.execute(node, ctx)) {
-            afterStep(i, graph);
-            return;
-        }
-        if (production2.execute(node, ctx)) {
-            afterStep(i, graph);
-            return;
-        }
+    afterStep(0, graph);
+    for (int j = 0; j< 5; j++) {
+        galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto &ctx) {
+            if (!graph.containsNode(node, galois::MethodFlag::WRITE)) {
+                return;
+            }
+            if (!node->getData().isHyperEdge()) {
+                return;
+            };
+            if (production0.execute(node, ctx)) {
+//                afterStep(i, graph);
+                return;
+            }
 
-    });
+        });
+        galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto &ctx) {
+            //        if (i>40) {
+            //            return;
+            //        }
+            if (!graph.containsNode(node, galois::MethodFlag::WRITE)) {
+                return;
+            }
+            if (!node->getData().isHyperEdge()) {
+                return;
+            }
+            std::cout << i++ << ": ";
+            if (production1.execute(node, ctx)) {
+                afterStep(i, graph);
+                return;
+            }
+            if (production2.execute(node, ctx)) {
+                afterStep(i, graph);
+                return;
+            }
+
+        });
+
+    }
 
     MyGraphFormatWriter::writeToFile(graph, "out/graph.mgf");
     system("./display.sh out/graph.mgf");
@@ -69,9 +88,9 @@ int main(int argc, char **argv) {
 }
 
 void afterStep(int i, Graph &graph) {
-    auto path = std::string("out/step") + std::to_string(i - 1) + ".mgf";
-    MyGraphFormatWriter::writeToFile(graph, path);
-    system((std::string("./display.sh ") + path).c_str());
+//    auto path = std::string("out/step") + std::to_string(i - 1) + ".mgf";
+//    MyGraphFormatWriter::writeToFile(graph, path);
+//    system((std::string("./display.sh ") + path).c_str());
     std::cout << std::endl;
 }
 

@@ -96,8 +96,8 @@ public:
 
     optional<GNode> findNodeBetween(const GNode &node1, const GNode &node2) const {
         Coordinates lookThere = (node1->getData().getCoords() + node2->getData().getCoords()) / 2.;
-         std::vector<GNode> neighbours1 = getNeighbours(node1);
-         std::vector<GNode> neighbours2 = getNeighbours(node2);
+        std::vector<GNode> neighbours1 = getNeighbours(node1);
+        std::vector<GNode> neighbours2 = getNeighbours(node2);
         for (GNode &iNode : neighbours1) {
             auto iNodeData = graph.getData(iNode);
             for (GNode &jNode : neighbours2) {

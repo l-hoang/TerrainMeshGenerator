@@ -60,7 +60,7 @@ private:
 
         auto edgePair = connManager.findSrc(edgesData[edgeToBreak]);
         graph.removeEdge(edgePair.first, edgePair.second);
-        NodeData newNodeData = NodeData{false, edgesData[edgeToBreak].getMiddlePoint(), true};
+        NodeData newNodeData = NodeData{false, edgesData[edgeToBreak].getMiddlePoint(), !breakingOnBorder};
         GNode newNode = graph.createNode(newNodeData);
         graph.addNode(newNode);
         ctx.push(newNode);
@@ -77,7 +77,7 @@ private:
 //        NodeData secondInteriorData = NodeData{true, false};
 //        auto secondInterior = connManager.createNode(secondInteriorData, ctx);
 //        GNode firstInterior;
-        NodeData firstInteriorData = NodeData{true, true};
+        NodeData firstInteriorData = NodeData{true, false};
         auto firstInterior = connManager.createNode(firstInteriorData, ctx);
 //        std::vector<GNode> vertices2;
 //        for (Graph::edge_iterator ii = graph.edge_begin(interior), ee = graph.edge_end(interior); ii != ee; ++ii) {
@@ -91,7 +91,7 @@ private:
 //        connManager.getGraph().addEdge(firstInterior, vertices[0]);
 //        connManager.getGraph().addEdge(firstInterior, vertices2[(edgeToBreak + 1) % 3]);
 
-        NodeData secondInteriorData = NodeData{true, true};
+        NodeData secondInteriorData = NodeData{true, false};
         auto secondInterior = connManager.createNode(secondInteriorData, ctx);
 
         connManager.getGraph().addEdge(secondInterior, newNode);
