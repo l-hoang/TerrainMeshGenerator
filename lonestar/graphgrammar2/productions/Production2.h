@@ -1,16 +1,12 @@
 #ifndef GALOIS_PRODUCTION2_H
 #define GALOIS_PRODUCTION2_H
 
+#include "Production.h"
 #include "../utils/ConnectivityManager.h"
 #include "../utils/utils.h"
 
-class Production2 {
+class Production2 : Production {
 private:
-    ConnectivityManager connManager;
-
-    bool checkBasicApplicabilityCondition(const NodeData &nodeData) const {
-        return nodeData.isHyperEdge();
-    }
 
     bool checkComplexApplicabilityCondition(const std::vector<optional<EdgeIterator>> &edgesIterators) const {
         return connManager.countBrokenEdges(edgesIterators) == 1;
@@ -176,15 +172,17 @@ private:
 
 public:
 
-    explicit Production2(const ConnectivityManager &connManager) : connManager(connManager) {}
+//    explicit Production2(const ConnectivityManager &connManager) : connManager(connManager) {}
 
-    bool execute(GNode interior, galois::UserContext<GNode> &ctx) {
+    using Production::Production;
+
+    bool execute(GNode interior, galois::UserContext<GNode> &ctx) override {
         Graph &graph = connManager.getGraph();
         NodeData &interiorData = graph.getData(interior);
 
-        if (!checkBasicApplicabilityCondition(interiorData)) {
-            return false;
-        }
+//        if (!checkBasicApplicabilityCondition(interiorData)) {
+//            return false;
+//        }
 
         const std::vector<GNode> &vertices = connManager.getNeighbours(interior);
         const std::vector<optional<EdgeIterator>> &edgesIterators = connManager.getTriangleEdges(vertices);

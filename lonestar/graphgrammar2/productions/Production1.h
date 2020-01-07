@@ -1,26 +1,23 @@
 #ifndef GALOIS_PRODUCTION1_H
 #define GALOIS_PRODUCTION1_H
 
+#include "Production.h"
 #include "../utils/ConnectivityManager.h"
 #include "../utils/utils.h"
 
-class Production1 {
+class Production1 : Production {
 private:
-    ConnectivityManager connManager;
 
-    bool checkBasicApplicabilityCondition(const NodeData &nodeData) const {
-        return nodeData.isHyperEdge() && nodeData.isToRefine();
+    bool checkApplicabilityCondition(const NodeData &nodeData,
+                                     const std::vector<optional<EdgeIterator>> &edgesIterators) const {
+        return nodeData.isToRefine() && !connManager.hasBrokenEdge(edgesIterators);
     }
 
-    bool checkComplexApplicabilityCondition(const std::vector<optional<EdgeIterator>> &edgesIterators) const {
-        return !connManager.hasBrokenEdge(edgesIterators);
-    }
-
-    int getEdgeToBreak(const std::vector<double> &lengths, const std::vector<EdgeData> &edgesData,
+    int getEdgeToBreak(const std::vector<double> &lengths, const std::vector<optional<EdgeData>> &edgesData,
                        const std::vector<NodeData> &verticesData) const {
         std::vector<int> longestEdges = getLongestEdges(lengths);
         for (int longest : longestEdges) {
-            if (edgesData[longest].isBorder()) {
+            if (edgesData[longest].get().isBorder()) {
                 return longest;
             }
             if (!verticesData[getEdgeVertices(longest).first].isHanging() &&
@@ -51,16 +48,16 @@ private:
         return firstInterior;
     }
 
-    void breakElement(int edgeToBreak, GNode &interior, const std::vector<EdgeData> &edgesData,
+    void breakElement(int edgeToBreak, GNode &interior, const std::vector<optional<EdgeData>> &edgesData,
                       const std::vector<GNode> &vertices,
                       const std::vector<NodeData> &verticesData, galois::UserContext<GNode> &ctx) const {
         Graph &graph = connManager.getGraph();
-        bool breakingOnBorder = edgesData[edgeToBreak].isBorder();
+        bool breakingOnBorder = edgesData[edgeToBreak].get().isBorder();
         int neutralVertex = getNeutralVertex(edgeToBreak);
 
-        auto edgePair = connManager.findSrc(edgesData[edgeToBreak]);
+        auto edgePair = connManager.findSrc(edgesData[edgeToBreak].get());
         graph.removeEdge(edgePair.first, edgePair.second);
-        NodeData newNodeData = NodeData{false, edgesData[edgeToBreak].getMiddlePoint(), !breakingOnBorder};
+        NodeData newNodeData = NodeData{false, edgesData[edgeToBreak].get().getMiddlePoint(), !breakingOnBorder};
         GNode newNode = graph.createNode(newNodeData);
         graph.addNode(newNode);
         ctx.push(newNode);
@@ -142,46 +139,29 @@ private:
 
 public:
 
-    explicit Production1(const ConnectivityManager &connManager) : connManager(connManager) {}
+//    explicit Production1(const ConnectivityManager &connManager) : connManager(connManager) {}
 
-    bool execute(GNode interior, galois::UserContext<GNode> &ctx) {
-        Graph &graph = connManager.getGraph();
-        NodeData &interiorData = interior->getData();
+    using Production::Production;
 
-        if (!checkBasicApplicabilityCondition(interiorData)) {
+    bool execute(GNode interior, galois::UserContext<GNode> &ctx) override {
+        ProductionState pState(connManager, interior);
+
+        if (!checkApplicabilityCondition(pState.getInteriorData(), pState.getEdgesIterators())) {
             return false;
         }
 
-        const std::vector<GNode> &vertices = connManager.getNeighbours(interior);
-        const std::vector<optional<EdgeIterator>> &edgesIterators = connManager.getTriangleEdges(vertices);
+        logg(pState.getInteriorData(), pState.getVerticesData());
 
-        if (!checkComplexApplicabilityCondition(edgesIterators)) {
-            return false;
-        }
-
-        std::vector<EdgeData> edgesData;
-        std::vector<double> lengths(3);
-        std::vector<NodeData> verticesData;
-        for (int i = 0; i < 3; ++i) {
-            edgesData.push_back(graph.getEdgeData(edgesIterators[i].get()));
-            lengths[i] = edgesData[i].getLength();
-            verticesData.push_back(graph.getData(vertices[i]));
-        }
-
-        logg(interiorData, verticesData);
-
-        int edgeToBreak = getEdgeToBreak(lengths, edgesData, verticesData);
+        int edgeToBreak = getEdgeToBreak(pState.getLengths(), pState.getEdgesData(), pState.getVerticesData());
         if (edgeToBreak == -1) {
             return false;
         }
 
-        breakElement(edgeToBreak, interior, edgesData, vertices, verticesData, ctx);
+        breakElement(edgeToBreak, pState.getInterior(), pState.getEdgesData(), pState.getVertices(), pState.getVerticesData(), ctx);
         std::cout << "P1 executed ";
 
         return true;
     }
-
-
 };
 
 
