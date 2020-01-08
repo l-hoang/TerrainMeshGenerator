@@ -20,8 +20,6 @@ public:
                                                                          edgesIterators(connManager.getTriangleEdges(
                                                                                  vertices)) {
         Graph &graph = connManager.getGraph();
-//        vertices = connManager.getNeighbours(interior);
-//        edgesIterators = connManager.getTriangleEdges(vertices);
         for (int i = 0; i < 3; ++i) {
             auto maybeEdgeIter = edgesIterators[i];
             edgesData.push_back(maybeEdgeIter ? graph.getEdgeData(maybeEdgeIter.get())

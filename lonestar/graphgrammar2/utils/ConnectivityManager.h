@@ -20,7 +20,7 @@ public:
 //        std::vector<GNode> vertices;
         int i = 0;
         Graph::edge_iterator ii = graph.edge_begin(node);
-        for (Graph::edge_iterator  ee = graph.edge_end(node); ii != ee || i < n; ++ii) {
+        for (Graph::edge_iterator ee = graph.edge_end(node); ii != ee || i < n; ++ii) {
 //            vertices.push_back(graph.getEdgeDst(ii));
         }
         return GNode(ii->first());
@@ -40,7 +40,7 @@ public:
 
     std::vector<optional<EdgeIterator>> getTriangleEdges(std::vector<GNode> vertices) {
         std::vector<optional<EdgeIterator>> edges;
-        for (int i = 0; i<3;i++) {
+        for (int i = 0; i < 3; i++) {
             edges.emplace_back(getEdge(vertices[i], vertices[(i + 1) % 3]));
         }
         return edges;
@@ -114,6 +114,17 @@ public:
         graph.addNode(node);
         ctx.push(node);
         return node;
+    }
+
+    void createInterior(const GNode &node1, const GNode &node2, const GNode &node3, galois::UserContext<GNode> &ctx) const {
+        NodeData secondInteriorData = NodeData{true, false};
+        auto secondInterior = createNode(secondInteriorData, ctx);
+
+        graph.addEdge(secondInterior, node1);
+        graph.addEdge(secondInterior, node2);
+        graph.addEdge(secondInterior, node3);
+        secondInterior->getData().setCoords(
+                (node1->getData().getCoords() + node2->getData().getCoords() + node3->getData().getCoords()) / 3.);
     }
 
     Graph &getGraph() const {

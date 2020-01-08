@@ -9,7 +9,7 @@ protected:
 
 public:
     explicit Production(const ConnectivityManager &connManager) : connManager(connManager) {}
-    virtual bool execute(GNode interior, galois::UserContext<GNode> &ctx) = 0;
+    virtual bool execute(ProductionState &pState, galois::UserContext<GNode> &ctx) = 0;
 };
 
 #endif //GALOIS_PRODUCTION_H

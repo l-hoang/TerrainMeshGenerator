@@ -8,7 +8,7 @@
 class Production2 : Production {
 private:
 
-    bool checkComplexApplicabilityCondition(const std::vector<optional<EdgeIterator>> &edgesIterators) const {
+    bool checkApplicabilityCondition(const std::vector<optional<EdgeIterator>> &edgesIterators) const {
         return connManager.countBrokenEdges(edgesIterators) == 1;
     }
 
@@ -22,7 +22,7 @@ private:
     }
 
     bool checkIfBrokenEdgeIsTheLongest(int brokenEdge, const std::vector<optional<EdgeIterator>> &edgesIterators,
-                                       const std::vector<GNode> &vertices, std::vector<NodeData> verticesData) {
+                                       const std::vector<GNode> &vertices, const std::vector<NodeData> &verticesData) {
         std::vector<double> lengths(4);
         Graph &graph = connManager.getGraph();
         for (int i = 0, j = 0; i < 3; ++i) {
@@ -41,117 +41,46 @@ private:
         return !less(lengths[2] + lengths[3], lengths[0]) && !less(lengths[2] + lengths[3], lengths[1]);
     }
 
-    std::vector<int> getLongestEdges(const std::vector<double> &lengths) const {
-        std::vector<int> longestEdges;
-        for (int i = 0; i < 3; ++i) {
-            if (!less(lengths[i], lengths[(i + 1) % 3]) && !less(lengths[i], lengths[(i + 2) % 3])) {
-                longestEdges.push_back(i);
-            }
-        }
-        return longestEdges;
-    }
-
-    void breakElement(int edgeToBreak, const GNode &hangingNode, GNode &interior, const std::vector<GNode> &vertices,
-                      const std::vector<NodeData> &verticesData, galois::UserContext<GNode> &ctx) const {
-        Graph &graph = connManager.getGraph();
-//        bool breakingOnBorder = edgesData[edgeToBreak].isBorder();
-        int neutralVertex = getNeutralVertex(edgeToBreak);
-
-//        auto edgePair = connManager.findSrc(edgesData[edgeToBreak]);
-//        graph.removeEdge(edgePair.first, edgePair.second);
-//        NodeData newNodeData = NodeData{false, edgesData[edgeToBreak].getMiddlePoint(), true};
-//        auto newNode = graph.createNode(newNodeData);
-//        graph.addNode(newNode);
-//        ctx.push(newNode);
-
-        NodeData &hNodeData = graph.getData(hangingNode);
-
-
-        const EdgeIterator &newEdge = graph.addEdge(hangingNode, vertices[neutralVertex]);
-        graph.getEdgeData(newEdge).setBorder(false);
-        graph.getEdgeData(newEdge).setLength(hNodeData.getCoords().dist(verticesData[neutralVertex].getCoords()));
-        graph.getEdgeData(newEdge).setMiddlePoint(
-                (hNodeData.getCoords() + verticesData[neutralVertex].getCoords()) / 2);
-
+//    std::vector<int> getLongestEdges(const std::vector<double> &lengths) const {
+//        std::vector<int> longestEdges;
 //        for (int i = 0; i < 3; ++i) {
-//            auto vertexData = verticesData[i];
-//            auto edge = graph.addEdge(newNode, vertices[i]);
-//            graph.getEdgeData(edge).setBorder(i != neutralVertex ? breakingOnBorder : false);
-//            graph.getEdgeData(edge).setMiddlePoint(
-//                    Coordinates{(newNodeData.getCoords().getX() + vertexData.getCoords().getX()) / 2.,
-//                                (newNodeData.getCoords().getY() + vertexData.getCoords().getY()) / 2.,
-//                                (newNodeData.getCoords().getZ() + vertexData.getCoords().getZ()) / 2.});
-//            graph.getEdgeData(edge).setLength(
-//                    sqrt(pow(newNodeData.getCoords().getX(), 2) + pow(newNodeData.getCoords().getY(), 2) + pow(
-//                            newNodeData.getCoords().getZ(), 2)));
-//        }
-//        const NodeData &firstInteriorData = NodeData{true, false}; //Refactor me
-//        const NodeData &secondInteriorData = NodeData{true, false};
-//        auto firstInterior = graph.createNode(firstInteriorData);
-//        auto secondInterior = graph.createNode(secondInteriorData);
-//        graph.addNode(firstInterior);
-//        graph.addNode(secondInterior);
-//        ctx.push(firstInterior);
-//        ctx.push(secondInterior);
-//        graph.addEdge(firstInterior, hangingNode);
-//        graph.addEdge(secondInterior, hangingNode);
-//        graph.addEdge(firstInterior, vertices[neutralVertex]);
-//        graph.addEdge(secondInterior, vertices[neutralVertex]);
-//        bool switc = false;
-//        for (int j = 0; j < 3; ++j) {
-//            if (j != neutralVertex) {
-//                graph.addEdge(!switc ? firstInterior : secondInterior, vertices[j]);
-//                switc = true;
+//            if (!less(lengths[i], lengths[(i + 1) % 3]) && !less(lengths[i], lengths[(i + 2) % 3])) {
+//                longestEdges.push_back(i);
 //            }
 //        }
+//        return longestEdges;
+//    }
 
 
+    void breakElement(int edgeToBreak, ProductionState &pState, galois::UserContext<GNode> &ctx) const {
+        Graph &graph = connManager.getGraph();
+        const std::pair<int, int> &brokenEdgeVertices = getEdgeVertices(edgeToBreak);
+        int neutralVertex = getNeutralVertex(edgeToBreak);
+        GNode &hangingNode = connManager.findNodeBetween(pState.getVertices()[brokenEdgeVertices.first],
+                                                         pState.getVertices()[brokenEdgeVertices.second]).get();
+        NodeData &hNodeData = graph.getData(hangingNode);
 
-        NodeData firstInteriorData = NodeData{true, false};
-        auto firstInterior = connManager.createNode(firstInteriorData, ctx);
-//        std::vector<GNode> vertices2;
-//        for (Graph::edge_iterator ii = graph.edge_begin(interior), ee = graph.edge_end(interior); ii != ee; ++ii) {
-//            Graph::edge_iterator ii = graph.edge_begin(interior);
-//            GNode v1 = graph.getEdgeDst(ii++);
-//            GNode v2 = graph.getEdgeDst(ii++);
-//            GNode v3 = graph.getEdgeDst(ii++);
-//        }
-        connManager.getGraph().addEdge(firstInterior, hangingNode);
-        connManager.getGraph().addEdge(firstInterior, vertices[neutralVertex]);
-//        connManager.getGraph().addEdge(firstInterior, vertices[0]);
-//        connManager.getGraph().addEdge(firstInterior, vertices2[(edgeToBreak + 1) % 3]);
+        addEdge(graph, hangingNode, pState.getVertices()[neutralVertex], false,
+                hNodeData.getCoords().dist(pState.getVerticesData()[neutralVertex].getCoords()),
+                (hNodeData.getCoords() + pState.getVerticesData()[neutralVertex].getCoords()) / 2);
 
-        NodeData secondInteriorData = NodeData{true, false};
-        auto secondInterior = connManager.createNode(secondInteriorData, ctx);
-
-        connManager.getGraph().addEdge(secondInterior, hangingNode);
-        connManager.getGraph().addEdge(secondInterior, vertices[neutralVertex]);
-//        connManager.getGraph().addEdge(secondInterior, connManager.getNeighbourN(interior, neutralVertex));
-//        connManager.getGraph().addEdge(secondInterior, vertices2[(edgeToBreak + 2) % 3]);
-
-//        GNode interior1 = createInterior(&newNode, vertices[neutralVertex], vertices[(edgeToBreak + 1) % 3], ctx);
-//        graph.addEdge(secondInterior, newNode);
-//        graph.addEdge(secondInterior, vertices[neutralVertex]);
-        bool switc = false;
-        for (int j = 0; j < 3; ++j) {
-            if (j != neutralVertex) {
-                graph.addEdge(!switc ? firstInterior : secondInterior, vertices[j]);
-                if (!switc) {
-                    firstInterior->getData().setCoords(
-                            (hNodeData.getCoords() + verticesData[neutralVertex].getCoords() +
-                             verticesData[j].getCoords()) / 3.);
-                } else {
-                    secondInterior->getData().setCoords(
-                            (hNodeData.getCoords() + verticesData[neutralVertex].getCoords() +
-                             verticesData[j].getCoords()) / 3.);
-                }
-                switc = true;
-            }
-        }
+        connManager.createInterior(hangingNode, pState.getVertices()[neutralVertex],
+                                   pState.getVertices()[brokenEdgeVertices.first], ctx);
+        connManager.createInterior(hangingNode, pState.getVertices()[neutralVertex],
+                                   pState.getVertices()[brokenEdgeVertices.second], ctx);
 
         hNodeData.setHanging(false);
 
-        graph.removeNode(interior);
+        graph.removeNode(pState.getInterior());
+    }
+
+    void addEdge(Graph &graph, GNode const &node1, GNode const &node2, bool border, double length,
+                 const Coordinates &middlePoint) const {
+        const EdgeIterator &newEdge = graph.addEdge(node1, node2);
+        graph.getEdgeData(newEdge).setBorder(border);
+        graph.getEdgeData(newEdge).setLength(length);
+        graph.getEdgeData(newEdge).setMiddlePoint(
+                middlePoint);
     }
 
     std::pair<int, int> getEdgeVertices(int edge) const {
@@ -172,43 +101,24 @@ private:
 
 public:
 
-//    explicit Production2(const ConnectivityManager &connManager) : connManager(connManager) {}
-
     using Production::Production;
 
-    bool execute(GNode interior, galois::UserContext<GNode> &ctx) override {
-        Graph &graph = connManager.getGraph();
-        NodeData &interiorData = graph.getData(interior);
-
-//        if (!checkBasicApplicabilityCondition(interiorData)) {
-//            return false;
-//        }
-
-        const std::vector<GNode> &vertices = connManager.getNeighbours(interior);
-        const std::vector<optional<EdgeIterator>> &edgesIterators = connManager.getTriangleEdges(vertices);
-
-        if (!checkComplexApplicabilityCondition(edgesIterators)) {
+    bool execute(ProductionState &pState, galois::UserContext<GNode> &ctx) override {
+        if (!checkApplicabilityCondition(pState.getEdgesIterators())) {
             return false;
         }
 
-        std::vector<NodeData> verticesData;
-        for (int i = 0; i < 3; ++i) {
-            verticesData.push_back(graph.getData(vertices[i]));
-        }
+        logg(pState.getInteriorData(), pState.getVerticesData());
 
-        logg(interiorData, verticesData);
-
-        int brokenEdge = getBrokenEdge(edgesIterators);
+        int brokenEdge = getBrokenEdge(pState.getEdgesIterators());
         assert(brokenEdge != -1);
 
-        if (!checkIfBrokenEdgeIsTheLongest(brokenEdge, edgesIterators, vertices, verticesData)) {
+        if (!checkIfBrokenEdgeIsTheLongest(brokenEdge, pState.getEdgesIterators(), pState.getVertices(),
+                                           pState.getVerticesData())) {
             return false;
         }
-        const std::pair<int, int> &brokenEdgeVertices = getEdgeVertices(brokenEdge);
-        GNode &hangingNode = connManager.findNodeBetween(vertices[brokenEdgeVertices.first],
-                                                         vertices[brokenEdgeVertices.second]).get();
 
-        breakElement(brokenEdge, hangingNode, interior, vertices, verticesData, ctx);
+        breakElement(brokenEdge, pState, ctx);
         std::cout << "P2 executed ";
         return true;
     }

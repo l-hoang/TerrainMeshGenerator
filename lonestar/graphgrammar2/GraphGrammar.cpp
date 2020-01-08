@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
             }
             if (!node->getData().isHyperEdge()) {
                 return;
-            };
+            }
             if (production0.execute(node, ctx)) {
 //                afterStep(i, graph);
                 return;
@@ -67,12 +67,14 @@ int main(int argc, char **argv) {
             if (!node->getData().isHyperEdge()) {
                 return;
             }
+            ConnectivityManager connManager{graph};
+            ProductionState pState(connManager, node);
             std::cout << i++ << ": ";
-            if (production1.execute(node, ctx)) {
+            if (production1.execute(pState, ctx)) {
                 afterStep(i, graph);
                 return;
             }
-            if (production2.execute(node, ctx)) {
+            if (production2.execute(pState, ctx)) {
                 afterStep(i, graph);
                 return;
             }

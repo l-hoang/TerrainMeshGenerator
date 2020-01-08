@@ -138,13 +138,10 @@ private:
     }
 
 public:
-
-//    explicit Production1(const ConnectivityManager &connManager) : connManager(connManager) {}
-
     using Production::Production;
 
-    bool execute(GNode interior, galois::UserContext<GNode> &ctx) override {
-        ProductionState pState(connManager, interior);
+    bool execute(ProductionState &pState, galois::UserContext<GNode> &ctx) override {
+//        ProductionState pState(connManager, interior);
 
         if (!checkApplicabilityCondition(pState.getInteriorData(), pState.getEdgesIterators())) {
             return false;
