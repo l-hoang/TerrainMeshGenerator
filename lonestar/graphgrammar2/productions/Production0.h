@@ -28,8 +28,6 @@ public:
             return false;
         }
 
-
-
         interiorData.setToRefine(true);
 //        ctx.push(interior);
         return true;

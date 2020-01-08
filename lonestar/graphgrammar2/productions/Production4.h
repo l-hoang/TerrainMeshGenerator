@@ -1,15 +1,15 @@
-#ifndef GALOIS_PRODUCTION2_H
-#define GALOIS_PRODUCTION2_H
+#ifndef GALOIS_PRODUCTION4_H
+#define GALOIS_PRODUCTION4_H
 
 #include "Production.h"
 #include "../utils/ConnectivityManager.h"
 #include "../utils/utils.h"
 
-class Production2 : Production {
+class Production4 : Production {
 private:
 
     bool checkApplicabilityCondition(const std::vector<optional<EdgeIterator>> &edgesIterators) const {
-        return connManager.countBrokenEdges(edgesIterators) == 1;
+        return connManager.countBrokenEdges(edgesIterators) == 2;
     }
 
     int getBrokenEdge(const std::vector<galois::optional<EdgeIterator>> &edgesIterators) const {
@@ -83,8 +83,6 @@ private:
                 middlePoint);
     }
 
-
-
     int getNeutralVertex(int edgeToBreak) const {
         return (edgeToBreak + 2) % 3;
     }
@@ -105,23 +103,21 @@ public:
         if (!checkApplicabilityCondition(pState.getEdgesIterators())) {
             return false;
         }
-
         logg(pState.getInteriorData(), pState.getVerticesData());
 
-        int brokenEdge = getBrokenEdge(pState.getEdgesIterators());
-        assert(brokenEdge != -1);
-
-        if (!checkIfBrokenEdgeIsTheLongest(brokenEdge, pState.getEdgesIterators(), pState.getVertices(),
-                                           pState.getVerticesData())) {
-            return false;
+        const vector<int> &longestEdges = getLongestEdgesIncludingBrokenOnes(pState.getVerticesData());
+        for (int longest : longestEdges) {
+            const vector<int> &brokenEdges = getBrokenEdges(pState.getEdgesIterators());
+            if (std::find(brokenEdges.begin(), brokenEdges.end(), longest) != brokenEdges.end()) {
+                breakElement(longest, pState, ctx);
+                std::cout << "P4 executed ";
+                return true;
+            }
         }
-
-        breakElement(brokenEdge, pState, ctx);
-        std::cout << "P2 executed ";
-        return true;
+        return false;
     }
 
 };
 
 
-#endif //GALOIS_PRODUCTION2_H
+#endif //GALOIS_PRODUCTION4_H

@@ -1,11 +1,11 @@
-#ifndef GALOIS_PRODUCTION2_H
-#define GALOIS_PRODUCTION2_H
+#ifndef GALOIS_PRODUCTION3_H
+#define GALOIS_PRODUCTION3_H
 
 #include "Production.h"
 #include "../utils/ConnectivityManager.h"
 #include "../utils/utils.h"
 
-class Production2 : Production {
+class Production3 : Production {
 private:
 
     bool checkApplicabilityCondition(const std::vector<optional<EdgeIterator>> &edgesIterators) const {
@@ -83,8 +83,6 @@ private:
                 middlePoint);
     }
 
-
-
     int getNeutralVertex(int edgeToBreak) const {
         return (edgeToBreak + 2) % 3;
     }
@@ -106,22 +104,38 @@ public:
             return false;
         }
 
-        logg(pState.getInteriorData(), pState.getVerticesData());
-
         int brokenEdge = getBrokenEdge(pState.getEdgesIterators());
         assert(brokenEdge != -1);
 
-        if (!checkIfBrokenEdgeIsTheLongest(brokenEdge, pState.getEdgesIterators(), pState.getVertices(),
-                                           pState.getVerticesData())) {
+        if (checkIfBrokenEdgeIsTheLongest(brokenEdge, pState.getEdgesIterators(), pState.getVertices(),
+                                          pState.getVerticesData())) {
             return false;
         }
 
-        breakElement(brokenEdge, pState, ctx);
-        std::cout << "P2 executed ";
-        return true;
+        logg(pState.getInteriorData(), pState.getVerticesData());
+
+        const vector<int> &longestEdges = getLongestEdges(pState.getLengths());
+
+        for (int longest : longestEdges) {
+            if (pState.getEdgesData()[longest].get().isBorder()) {
+                breakElement(longest, pState, ctx);
+                std::cout << "P3 executed ";
+                return true;
+            }
+        }
+        for (int longest : longestEdges) {
+            if (!pState.getVerticesData()[getEdgeVertices(longest).first].isHanging() &&
+                !pState.getVerticesData()[getEdgeVertices(longest).second].isHanging()) {
+
+                breakElement(longest, pState, ctx);
+                std::cout << "P3 executed ";
+                return true;
+            }
+        }
+        return false;
     }
 
 };
 
 
-#endif //GALOIS_PRODUCTION2_H
+#endif //GALOIS_PRODUCTION3_H

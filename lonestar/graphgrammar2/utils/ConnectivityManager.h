@@ -71,10 +71,10 @@ public:
         return countBrokenEdges(edges) > 0;
     }
 
-    bool countBrokenEdges(const std::vector<optional<EdgeIterator>> &edges) const {
+    int countBrokenEdges(const std::vector<optional<EdgeIterator>> &edges) const {
         int counter = 0;
         for (const optional<EdgeIterator> &edge : edges) {
-            if (!edge.is_initialized()) {
+            if (!edge) {
                 counter++;
             }
         }

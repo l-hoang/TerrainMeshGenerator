@@ -1,15 +1,15 @@
-#ifndef GALOIS_PRODUCTION2_H
-#define GALOIS_PRODUCTION2_H
+#ifndef GALOIS_PRODUCTION6_H
+#define GALOIS_PRODUCTION6_H
 
 #include "Production.h"
 #include "../utils/ConnectivityManager.h"
 #include "../utils/utils.h"
 
-class Production2 : Production {
+class Production6 : Production {
 private:
 
     bool checkApplicabilityCondition(const std::vector<optional<EdgeIterator>> &edgesIterators) const {
-        return connManager.countBrokenEdges(edgesIterators) == 1;
+        return connManager.countBrokenEdges(edgesIterators) == 3;
     }
 
     int getBrokenEdge(const std::vector<galois::optional<EdgeIterator>> &edgesIterators) const {
@@ -83,8 +83,6 @@ private:
                 middlePoint);
     }
 
-
-
     int getNeutralVertex(int edgeToBreak) const {
         return (edgeToBreak + 2) % 3;
     }
@@ -106,19 +104,16 @@ public:
             return false;
         }
 
+        const vector<int> &longestEdges = getLongestEdgesIncludingBrokenOnes(pState.getVerticesData());
+
         logg(pState.getInteriorData(), pState.getVerticesData());
-
-        int brokenEdge = getBrokenEdge(pState.getEdgesIterators());
-        assert(brokenEdge != -1);
-
-        if (!checkIfBrokenEdgeIsTheLongest(brokenEdge, pState.getEdgesIterators(), pState.getVertices(),
-                                           pState.getVerticesData())) {
-            return false;
-        }
-
-        breakElement(brokenEdge, pState, ctx);
-        std::cout << "P2 executed ";
-        return true;
+//        const vector<int> &brokenEdges = getBrokenEdges(pState.getEdgesIterators());
+//        if (std::find(brokenEdges.begin(), brokenEdges.end(), longestEdges[0]) == brokenEdges.end()) {
+            breakElement(longestEdges[0], pState, ctx);
+            std::cout << "P5 executed ";
+            return true;
+//        }
+//        return false;
     }
 
 };

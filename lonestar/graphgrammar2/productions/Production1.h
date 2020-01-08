@@ -29,15 +29,15 @@ private:
         return -1;
     }
 
-    std::vector<int> getLongestEdges(const std::vector<double> &lengths) const {
-        std::vector<int> longestEdges;
-        for (int i = 0; i < 3; ++i) {
-            if (!less(lengths[i], lengths[(i + 1) % 3]) && !less(lengths[i], lengths[(i + 2) % 3])) {
-                longestEdges.push_back(i);
-            }
-        }
-        return longestEdges;
-    }
+//    std::vector<int> getLongestEdges(const std::vector<double> &lengths) const {
+//        std::vector<int> longestEdges;
+//        for (int i = 0; i < 3; ++i) {
+//            if (!less(lengths[i], lengths[(i + 1) % 3]) && !less(lengths[i], lengths[(i + 2) % 3])) {
+//                longestEdges.push_back(i);
+//            }
+//        }
+//        return longestEdges;
+//    }
 
     GNode createInterior(GNode *node1, GNode *node2, GNode *node3, galois::UserContext<GNode> &ctx) const {
         NodeData firstInteriorData = NodeData{true, false};
