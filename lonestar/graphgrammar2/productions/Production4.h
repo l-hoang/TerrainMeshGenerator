@@ -22,9 +22,9 @@ public:
         }
         logg(pState.getInteriorData(), pState.getVerticesData());
 
-        const vector<int> &longestEdges = getLongestEdgesIncludingBrokenOnes(pState.getVerticesData());
+        const vector<int> &longestEdges = pState.getLongestEdgesIncludingBrokenOnes();
         for (int longest : longestEdges) {
-            const vector<int> &brokenEdges = getBrokenEdges(pState.getEdgesIterators());
+            const vector<int> &brokenEdges = pState.getBrokenEdges();
             if (std::find(brokenEdges.begin(), brokenEdges.end(), longest) != brokenEdges.end()) {
                 breakElementWithHangingNode(longest, pState, ctx);
                 std::cout << "P4 executed ";

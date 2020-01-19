@@ -24,7 +24,7 @@ public:
 
         logg(pState.getInteriorData(), pState.getVerticesData());
 
-        int brokenEdge = getAnyBrokenEdge(pState.getEdgesIterators());
+        int brokenEdge = pState.getAnyBrokenEdge();
         assert(brokenEdge != -1);
 
         if (!checkIfBrokenEdgeIsTheLongest(brokenEdge, pState.getEdgesIterators(), pState.getVertices(),

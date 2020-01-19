@@ -15,7 +15,7 @@ private:
 
     int getEdgeToBreak(const ProductionState &pState) const {
         const vector<NodeData> &verticesData = pState.getVerticesData();
-        for (int longest : getLongestEdges(pState.getLengths())) {
+        for (int longest : pState.getLongestEdges()) {
             if (pState.getEdgesData()[longest].get().isBorder()) {
                 return longest;
             }

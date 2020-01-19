@@ -21,7 +21,7 @@ public:
             return false;
         }
 
-        int brokenEdge = getAnyBrokenEdge(pState.getEdgesIterators());
+        int brokenEdge = pState.getAnyBrokenEdge();
         assert(brokenEdge != -1);
 
         if (checkIfBrokenEdgeIsTheLongest(brokenEdge, pState.getEdgesIterators(), pState.getVertices(),
@@ -31,7 +31,7 @@ public:
 
         logg(pState.getInteriorData(), pState.getVerticesData());
 
-        const vector<int> &longestEdges = getLongestEdges(pState.getLengths());
+        const vector<int> &longestEdges = pState.getLongestEdges();
 
         for (int longest : longestEdges) {
             if (pState.getEdgesData()[longest].get().isBorder()) {

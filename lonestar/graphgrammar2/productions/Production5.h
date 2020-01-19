@@ -21,13 +21,13 @@ public:
             return false;
         }
 
-        const vector<int> &longestEdges = getLongestEdgesIncludingBrokenOnes(pState.getVerticesData());
+        const vector<int> &longestEdges = pState.getLongestEdgesIncludingBrokenOnes();
         if (longestEdges.size() > 1) {
             return false;
         }
 
         logg(pState.getInteriorData(), pState.getVerticesData());
-        const vector<int> &brokenEdges = getBrokenEdges(pState.getEdgesIterators());
+        const vector<int> &brokenEdges = pState.getBrokenEdges();
         if (std::find(brokenEdges.begin(), brokenEdges.end(), longestEdges[0]) == brokenEdges.end()) {
             breakElementWithoutHangingNode(longestEdges[0], pState, ctx);
             std::cout << "P5 executed ";

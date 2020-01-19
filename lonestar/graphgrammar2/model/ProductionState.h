@@ -29,6 +29,45 @@ public:
         }
     }
 
+    std::vector<int> getLongestEdges() const {
+        std::vector<int> longestEdges;
+        for (int i = 0; i < 3; ++i) {
+            if (!less(lengths[i], lengths[(i + 1) % 3]) && !less(lengths[i], lengths[(i + 2) % 3])) {
+                longestEdges.push_back(i);
+            }
+        }
+        return longestEdges;
+    }
+
+    int getAnyBrokenEdge() const {
+        const vector<int> &brokenEdges = getBrokenEdges();
+        if (!brokenEdges.empty()) {
+            return brokenEdges[0];
+        } else {
+            return -1;
+        }
+    }
+
+    std::vector<int> getBrokenEdges() const {
+        std::vector<int> result;
+        for (int i = 0; i < 3; ++i) {
+            if (!edgesIterators[i]) {
+                result.push_back(i);
+            }
+        }
+        return result;
+    }
+
+    std::vector<int> getLongestEdgesIncludingBrokenOnes() const {
+        std::vector<double> verticesDistances(3);
+        for (int i = 0; i < 3; ++i) {
+            verticesDistances[i] = verticesData[i].getCoords().dist(verticesData[(i + 1) % 3].getCoords());
+        }
+        return indexesOfMaxElems(verticesDistances);
+    }
+
+
+
     GNode &getInterior() const {
         return interior;
     }

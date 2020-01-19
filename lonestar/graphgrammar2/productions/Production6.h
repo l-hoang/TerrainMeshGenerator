@@ -21,7 +21,7 @@ public:
             return false;
         }
 
-        const vector<int> &longestEdges = getLongestEdgesIncludingBrokenOnes(pState.getVerticesData());
+        const vector<int> &longestEdges = pState.getLongestEdgesIncludingBrokenOnes();
 
         logg(pState.getInteriorData(), pState.getVerticesData());
         breakElementWithHangingNode(longestEdges[0], pState, ctx);
