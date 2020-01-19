@@ -13,11 +13,10 @@ private:
         return nodeData.isToRefine() && !connManager.hasBrokenEdge(edgesIterators);
     }
 
-    int getEdgeToBreak(const std::vector<double> &lengths, const std::vector<optional<EdgeData>> &edgesData,
-                       const std::vector<NodeData> &verticesData) const {
-        std::vector<int> longestEdges = getLongestEdges(lengths);
-        for (int longest : longestEdges) {
-            if (edgesData[longest].get().isBorder()) {
+    int getEdgeToBreak(const ProductionState &pState) const {
+        const vector<NodeData> &verticesData = pState.getVerticesData();
+        for (int longest : getLongestEdges(pState.getLengths())) {
+            if (pState.getEdgesData()[longest].get().isBorder()) {
                 return longest;
             }
             if (!verticesData[getEdgeVertices(longest).first].isHanging() &&
@@ -34,15 +33,13 @@ public:
     using Production::Production;
 
     bool execute(ProductionState &pState, galois::UserContext<GNode> &ctx) override {
-//        ProductionState pState(connManager, interior);
-
         if (!checkApplicabilityCondition(pState.getInteriorData(), pState.getEdgesIterators())) {
             return false;
         }
 
         logg(pState.getInteriorData(), pState.getVerticesData());
 
-        int edgeToBreak = getEdgeToBreak(pState.getLengths(), pState.getEdgesData(), pState.getVerticesData());
+        int edgeToBreak = getEdgeToBreak(pState);
         if (edgeToBreak == -1) {
             return false;
         }

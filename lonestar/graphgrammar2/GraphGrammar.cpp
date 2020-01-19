@@ -44,8 +44,8 @@ int main(int argc, char **argv) {
     galois::reportPageAlloc("MeminfoPre2");
 
 
-    MyGraphFormatWriter::writeToFile(graph, "out/graph.mgf");
-    system("./display.sh out/graph.mgf");
+//    MyGraphFormatWriter::writeToFile(graph, "out/graph.mgf");
+//    system("./display.sh out/graph.mgf");
     Production0 production0;
     Production1 production1{graph};
     Production2 production2{graph};
@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
     Production5 production5{graph};
     Production6 production6{graph};
     int i = 0;
-    afterStep(0, graph);
+//    afterStep(0, graph);
     for (int j = 0; j< 5; j++) {
         galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto &ctx) {
             if (!graph.containsNode(node, galois::MethodFlag::WRITE)) {
@@ -119,8 +119,8 @@ int main(int argc, char **argv) {
 
 void afterStep(int i, Graph &graph) {
     auto path = std::string("out/step") + std::to_string(i - 1) + ".mgf";
-    MyGraphFormatWriter::writeToFile(graph, path);
-    system((std::string("./display.sh ") + path).c_str());
+//    MyGraphFormatWriter::writeToFile(graph, path);
+//    system((std::string("./display.sh ") + path).c_str());
     std::cout << std::endl;
 }
 

@@ -4,6 +4,12 @@
 #include "../model/ProductionState.h"
 
 class Production {
+
+public:
+    explicit Production(const ConnectivityManager &connManager) : connManager(connManager) {}
+
+    virtual bool execute(ProductionState &pState, galois::UserContext<GNode> &ctx) = 0;
+
 protected:
     ConnectivityManager connManager;
 
@@ -17,7 +23,7 @@ protected:
         return longestEdges;
     }
 
-    int getBrokenEdge(const std::vector<galois::optional<EdgeIterator>> &edgesIterators) const {
+    int getAnyBrokenEdge(const std::vector<galois::optional<EdgeIterator>> &edgesIterators) const {
         const vector<int> &brokenEdges = getBrokenEdges(edgesIterators);
         if (!brokenEdges.empty()) {
             return brokenEdges[0];
@@ -39,32 +45,60 @@ protected:
     std::vector<int> getLongestEdgesIncludingBrokenOnes(const std::vector<NodeData> &verticesData) const {
         std::vector<double> lengths(3);
         for (int i = 0; i < 3; ++i) {
-            lengths[i] = verticesData[i].getCoords().dist(verticesData[(i+1)%3].getCoords());
+            lengths[i] = verticesData[i].getCoords().dist(verticesData[(i + 1) % 3].getCoords());
         }
         return indexesOfMaxElems(lengths);
+    }
+
+    bool checkIfBrokenEdgeIsTheLongest(int brokenEdge, const std::vector<optional<EdgeIterator>> &edgesIterators,
+                                       const std::vector<GNode> &vertices,
+                                       const std::vector<NodeData> &verticesData) const {
+        std::vector<double> lengths(4);
+        Graph &graph = connManager.getGraph();
+        for (int i = 0, j = 0; i < 3; ++i) {
+            if (i != brokenEdge) {
+                lengths[j++] = graph.getEdgeData(edgesIterators[i].get()).getLength();
+            } else {
+                const std::pair<int, int> &brokenEdgeVertices = getEdgeVertices(brokenEdge);
+                GNode &hangingNode = connManager.findNodeBetween(vertices[brokenEdgeVertices.first],
+                                                                 vertices[brokenEdgeVertices.second]).get();
+                lengths[2] = graph.getEdgeData(
+                        graph.findEdge(vertices[brokenEdgeVertices.first], hangingNode)).getLength();
+                lengths[3] = graph.getEdgeData(
+                        graph.findEdge(vertices[brokenEdgeVertices.second], hangingNode)).getLength();
+            }
+        }
+        return !less(lengths[2] + lengths[3], lengths[0]) && !less(lengths[2] + lengths[3], lengths[1]);
     }
 
     std::pair<int, int> getEdgeVertices(int edge) const {
         return std::pair<int, int>{edge, (edge + 1) % 3};
     }
 
-
     void breakElementWithHangingNode(int edgeToBreak, ProductionState &pState, galois::UserContext<GNode> &ctx) const {
-        const std::pair<int, int> &brokenEdgeVertices = getEdgeVertices(edgeToBreak);
-        GNode &hangingNode = connManager.findNodeBetween(pState.getVertices()[brokenEdgeVertices.first],
-                                                         pState.getVertices()[brokenEdgeVertices.second]).get();
+        GNode hangingNode = getHangingNode(edgeToBreak, pState);
 
         breakElementUsingNode(edgeToBreak, hangingNode, pState, ctx);
 
         hangingNode->getData().setHanging(false);
     }
 
-    void breakElementWithoutHangingNode(int edgeToBreak, ProductionState &pState, galois::UserContext<GNode> &ctx) const {
+    void breakElementWithoutHangingNode(int edgeToBreak, ProductionState &pState,
+                                        galois::UserContext<GNode> &ctx) const {
         GNode newNode = createNodeOnEdge(edgeToBreak, pState, ctx);
-
         breakElementUsingNode(edgeToBreak, newNode, pState, ctx);
     }
 
+
+    static void logg(const NodeData &interiorData, const std::vector<NodeData> &verticesData) {
+        std::cout << "interior: (" << interiorData.getCoords().toString() << "), neighbours: (";
+        for (auto vertex : verticesData) {
+            std::cout << vertex.getCoords().toString() + ", ";
+        }
+        std::cout << ") ";
+    }
+
+private:
     GNode createNodeOnEdge(int edgeToBreak, ProductionState &pState, galois::UserContext<GNode> &ctx) const {
         Graph &graph = connManager.getGraph();
         const vector<galois::optional<EdgeData>> &edgesData = pState.getEdgesData();
@@ -88,6 +122,12 @@ protected:
             graph.getEdgeData(edge).setLength(newNodeData.getCoords().dist(vertexData.getCoords()));
         }
         return newNode;
+    }
+
+    GNode getHangingNode(int edgeToBreak, const ProductionState &pState) const {
+        const std::pair<int, int> &brokenEdgeVertices = getEdgeVertices(edgeToBreak);
+        return connManager.findNodeBetween(pState.getVertices()[brokenEdgeVertices.first],
+                                           pState.getVertices()[brokenEdgeVertices.second]).get();
     }
 
     void breakElementUsingNode(int edgeToBreak, GNode const &hangingNode, const ProductionState &pState,
@@ -121,40 +161,6 @@ protected:
         return (edgeToBreak + 2) % 3;
     }
 
-
-    bool checkIfBrokenEdgeIsTheLongest(int brokenEdge, const std::vector<optional<EdgeIterator>> &edgesIterators,
-                                       const std::vector<GNode> &vertices, const std::vector<NodeData> &verticesData) {
-        std::vector<double> lengths(4);
-        Graph &graph = connManager.getGraph();
-        for (int i = 0, j = 0; i < 3; ++i) {
-            if (i != brokenEdge) {
-                lengths[j++] = graph.getEdgeData(edgesIterators[i].get()).getLength();
-            } else {
-                const std::pair<int, int> &brokenEdgeVertices = getEdgeVertices(brokenEdge);
-                GNode &hangingNode = connManager.findNodeBetween(vertices[brokenEdgeVertices.first],
-                                                                 vertices[brokenEdgeVertices.second]).get();
-                lengths[2] = graph.getEdgeData(
-                        graph.findEdge(vertices[brokenEdgeVertices.first], hangingNode)).getLength();
-                lengths[3] = graph.getEdgeData(
-                        graph.findEdge(vertices[brokenEdgeVertices.second], hangingNode)).getLength();
-            }
-        }
-        return !less(lengths[2] + lengths[3], lengths[0]) && !less(lengths[2] + lengths[3], lengths[1]);
-    }
-
-
-    static void logg(const NodeData &interiorData, const std::vector<NodeData> &verticesData) {
-        std::cout << "interior: (" << interiorData.getCoords().toString() << "), neighbours: (";
-        for (auto vertex : verticesData) {
-            std::cout << vertex.getCoords().toString() + ", ";
-        }
-        std::cout << ") ";
-    }
-
-
-public:
-    explicit Production(const ConnectivityManager &connManager) : connManager(connManager) {}
-    virtual bool execute(ProductionState &pState, galois::UserContext<GNode> &ctx) = 0;
 };
 
 #endif //GALOIS_PRODUCTION_H
