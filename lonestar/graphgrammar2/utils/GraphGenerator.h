@@ -5,56 +5,21 @@
 class GraphGenerator {
 public:
     static void generateSampleGraph(Graph &graph) {
-        GNode node1, node2, node3, node4, hEdge1, hEdge2;
-        node1 = graph.createNode(NodeData{false, Coordinates{0, 0, 0}, false});
-        node2 = graph.createNode(NodeData{false, Coordinates{0, 1, 0}, false});
-        node3 = graph.createNode(NodeData{false, Coordinates{1, 0, 0}, false});
-        node4 = graph.createNode(NodeData{false, Coordinates{1, 1, 0}, false});
-        hEdge1 = graph.createNode(NodeData{true, true, Coordinates{0.3,0.7,0}});
-        hEdge2 = graph.createNode(NodeData{true, true, Coordinates{0.7,0.3,0}});
+        vector<GNode> nodes;
+        ConnectivityManager connManager{graph};
+        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{0, 0, 0}, false}));
+        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{0, 1, 0}, false}));
+        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{1, 0, 0}, false}));
+        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{1, 1, 0}, false}));
 
-        graph.addNode(node1);
-        graph.addNode(node2);
-        graph.addNode(node3);
-        graph.addNode(node4);
-        graph.addNode(hEdge1);
-        graph.addNode(hEdge2);
+        connManager.createEdge(nodes[0], nodes[1], true, Coordinates{0, 0.5, 0}, 1);
+        connManager.createEdge(nodes[1], nodes[3], true, Coordinates{0.5, 1, 0}, 1);
+        connManager.createEdge(nodes[2], nodes[3], true, Coordinates{1, 0.5, 0}, 1);
+        connManager.createEdge(nodes[0], nodes[2], true, Coordinates{0.5, 0, 0}, 1);
+        connManager.createEdge(nodes[3], nodes[0], false, Coordinates{0.5, 0.5, 0}, sqrt(2));
 
-        graph.addEdge(node1, node2);
-        graph.getEdgeData(graph.findEdge(node1, node2)).setBorder(true);
-        graph.getEdgeData(graph.findEdge(node1, node2)).setMiddlePoint(Coordinates{0, 0.5, 0});
-        graph.getEdgeData(graph.findEdge(node1, node2)).setLength(1);
-        graph.addEdge(node2, node4);
-        graph.getEdgeData(graph.findEdge(node2, node4)).setBorder(true);
-        graph.getEdgeData(graph.findEdge(node2, node4)).setMiddlePoint(Coordinates{0.5, 1, 0});
-        graph.getEdgeData(graph.findEdge(node2, node4)).setLength(1);
-        graph.addEdge(node3, node4);
-        graph.getEdgeData(graph.findEdge(node3, node4)).setBorder(true);
-        graph.getEdgeData(graph.findEdge(node3, node4)).setMiddlePoint(Coordinates{1, 0.5, 0});
-        graph.getEdgeData(graph.findEdge(node3, node4)).setLength(1);
-        graph.addEdge(node1, node3);
-        graph.getEdgeData(graph.findEdge(node1, node3)).setBorder(true);
-        graph.getEdgeData(graph.findEdge(node1, node3)).setMiddlePoint(Coordinates{0.5, 0, 0});
-        graph.getEdgeData(graph.findEdge(node1, node3)).setLength(1);
-        graph.addEdge(node4, node1);
-        graph.getEdgeData(graph.findEdge(node4, node1)).setBorder(false);
-        graph.getEdgeData(graph.findEdge(node4, node1)).setMiddlePoint(Coordinates{0.5, 0.5, 0});
-        graph.getEdgeData(graph.findEdge(node4, node1)).setLength(sqrt(2));
-
-        graph.addEdge(hEdge1, node1);
-        graph.getEdgeData(graph.findEdge(hEdge1, node1)).setBorder(false);
-        graph.addEdge(hEdge1, node2);
-        graph.getEdgeData(graph.findEdge(hEdge1, node2)).setBorder(false);
-        graph.addEdge(hEdge1, node4);
-        graph.getEdgeData(graph.findEdge(hEdge1, node4)).setBorder(false);
-
-        graph.addEdge(hEdge2, node1);
-        graph.getEdgeData(graph.findEdge(hEdge2, node1)).setBorder(false);
-        graph.addEdge(hEdge2, node4);
-        graph.getEdgeData(graph.findEdge(hEdge2, node4)).setBorder(false);
-        graph.addEdge(hEdge2, node3);
-        graph.getEdgeData(graph.findEdge(hEdge2, node3)).setBorder(false);
-
+        connManager.createInterior(nodes[0], nodes[1], nodes[3]);
+        connManager.createInterior(nodes[0], nodes[3], nodes[2]);
     }
 
     static void generateSampleGraph3(Graph &graph) {
@@ -65,10 +30,10 @@ public:
         node4 = graph.createNode(NodeData{false, Coordinates{1, 1, 0}, false});
         node5 = graph.createNode(NodeData{false, Coordinates{1.5, 0.5, 0}, false});
         node6 = graph.createNode(NodeData{false, Coordinates{0.5, -0.5, 0}, false});
-        hEdge1 = graph.createNode(NodeData{true, true, Coordinates{0.3,0.7,0}});
-        hEdge2 = graph.createNode(NodeData{true, true, Coordinates{0.7,0.3,0}});
-        hEdge3 = graph.createNode(NodeData{true, true, Coordinates{1.17,0.5,0}});
-        hEdge4 = graph.createNode(NodeData{true, true, Coordinates{0.5,-0.17,0}});
+        hEdge1 = graph.createNode(NodeData{true, true, Coordinates{0.3, 0.7, 0}});
+        hEdge2 = graph.createNode(NodeData{true, true, Coordinates{0.7, 0.3, 0}});
+        hEdge3 = graph.createNode(NodeData{true, true, Coordinates{1.17, 0.5, 0}});
+        hEdge4 = graph.createNode(NodeData{true, true, Coordinates{0.5, -0.17, 0}});
 
         graph.addNode(node1);
         graph.addNode(node2);
@@ -104,19 +69,19 @@ public:
         graph.addEdge(node5, node4);
         graph.getEdgeData(graph.findEdge(node5, node4)).setBorder(true);
         graph.getEdgeData(graph.findEdge(node5, node4)).setMiddlePoint(Coordinates{1.25, 0.75, 0});
-        graph.getEdgeData(graph.findEdge(node5, node4)).setLength(sqrt(2)/2.);
+        graph.getEdgeData(graph.findEdge(node5, node4)).setLength(sqrt(2) / 2.);
         graph.addEdge(node5, node3);
         graph.getEdgeData(graph.findEdge(node5, node3)).setBorder(true);
         graph.getEdgeData(graph.findEdge(node5, node3)).setMiddlePoint(Coordinates{1.25, 0.25, 0});
-        graph.getEdgeData(graph.findEdge(node5, node3)).setLength(sqrt(2)/2.);
+        graph.getEdgeData(graph.findEdge(node5, node3)).setLength(sqrt(2) / 2.);
         graph.addEdge(node6, node1);
         graph.getEdgeData(graph.findEdge(node6, node1)).setBorder(true);
         graph.getEdgeData(graph.findEdge(node6, node1)).setMiddlePoint(Coordinates{0.25, -0.25, 0});
-        graph.getEdgeData(graph.findEdge(node6, node1)).setLength(sqrt(2)/2.);
+        graph.getEdgeData(graph.findEdge(node6, node1)).setLength(sqrt(2) / 2.);
         graph.addEdge(node6, node3);
         graph.getEdgeData(graph.findEdge(node6, node3)).setBorder(true);
         graph.getEdgeData(graph.findEdge(node6, node3)).setMiddlePoint(Coordinates{0.75, -0.25, 0});
-        graph.getEdgeData(graph.findEdge(node6, node3)).setLength(sqrt(2)/2.);
+        graph.getEdgeData(graph.findEdge(node6, node3)).setLength(sqrt(2) / 2.);
 
         graph.addEdge(hEdge1, node1);
         graph.getEdgeData(graph.findEdge(hEdge1, node1)).setBorder(false);
@@ -228,13 +193,13 @@ public:
         }
 
         for (int k = 0; k < 4; ++k) {
-            graph.addEdge(hEdges[k], nodes[(k + k/2) % 9]);
-            graph.addEdge(hEdges[k], nodes[(k + 1 + k/2) % 9]);
-            graph.addEdge(hEdges[k], nodes[(k + 4 + k/2) % 9]);
+            graph.addEdge(hEdges[k], nodes[(k + k / 2) % 9]);
+            graph.addEdge(hEdges[k], nodes[(k + 1 + k / 2) % 9]);
+            graph.addEdge(hEdges[k], nodes[(k + 4 + k / 2) % 9]);
 
-            graph.addEdge(hEdges[(k + 4) % 8], nodes[(k + k/2) % 9]);
-            graph.addEdge(hEdges[(k + 4) % 8], nodes[(k + 3 + k/2) % 9]);
-            graph.addEdge(hEdges[(k + 4) % 8], nodes[(k + 4 + k/2) % 9]);
+            graph.addEdge(hEdges[(k + 4) % 8], nodes[(k + k / 2) % 9]);
+            graph.addEdge(hEdges[(k + 4) % 8], nodes[(k + 3 + k / 2) % 9]);
+            graph.addEdge(hEdges[(k + 4) % 8], nodes[(k + 4 + k / 2) % 9]);
         }
 
 

@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
     galois::SharedMemSys G;
     LonestarStart(argc, argv, name, desc, url);//---------
     Graph graph{};
-    GraphGenerator::generateSampleGraph3(graph);
+    GraphGenerator::generateSampleGraph(graph);
 
     galois::reportPageAlloc("MeminfoPre1");
     // Tighter upper bound for pre-alloc, useful for machines with limited memory,
@@ -39,8 +39,8 @@ int main(int argc, char **argv) {
     galois::reportPageAlloc("MeminfoPre2");
 
 
-//    MyGraphFormatWriter::writeToFile(graph, "out/graph.mgf");
-//    system("./display.sh out/graph.mgf");
+    MyGraphFormatWriter::writeToFile(graph, "out/graph.mgf");
+    system("./display.sh out/graph.mgf");
     Production0 production0;
     Production1 production1{graph};
     Production2 production2{graph};

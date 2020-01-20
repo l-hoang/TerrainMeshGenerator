@@ -81,16 +81,39 @@ public:
     }
 
     GNode createNode(NodeData &nodeData, galois::UserContext<GNode> &ctx) const {
+        GNode node = createNode(nodeData);
+        ctx.push(node);
+        return std::move(node);
+    }
+
+    GNode createNode(NodeData nodeData) const {
         auto node = graph.createNode(nodeData);
         graph.addNode(node);
-        ctx.push(node);
         return node;
+    }
+
+    void createEdge(GNode &node1, GNode &node2, bool border, const Coordinates &middlePoint, double length) {
+        graph.addEdge(node1, node2);
+        graph.getEdgeData(graph.findEdge(node1, node2)).setBorder(border);
+        graph.getEdgeData(graph.findEdge(node1, node2)).setMiddlePoint(middlePoint);
+        graph.getEdgeData(graph.findEdge(node1, node2)).setLength(length);
     }
 
     void createInterior(const GNode &node1, const GNode &node2, const GNode &node3,
                         galois::UserContext<GNode> &ctx) const {
         NodeData interiorData = NodeData{true, false};
         auto interior = createNode(interiorData, ctx);
+
+        graph.addEdge(interior, node1);
+        graph.addEdge(interior, node2);
+        graph.addEdge(interior, node3);
+        interior->getData().setCoords(
+                (node1->getData().getCoords() + node2->getData().getCoords() + node3->getData().getCoords()) / 3.);
+    }
+
+    void createInterior(const GNode &node1, const GNode &node2, const GNode &node3) const {
+        NodeData interiorData = NodeData{true, false};
+        auto interior = createNode(interiorData);
 
         graph.addEdge(interior, node1);
         graph.addEdge(interior, node2);
