@@ -7,11 +7,12 @@ class ProductionState {
 private:
     GNode &interior;
     NodeData &interiorData;
-    vector<galois::optional<EdgeData>> edgesData;
-    vector<double> lengths;
     vector<NodeData> verticesData;
     const vector<GNode> vertices;
     const vector<optional<EdgeIterator>> edgesIterators;
+    vector<galois::optional<EdgeData>> edgesData;
+    vector<double> lengths;
+    vector<int> brokenEdges;
 
 public:
     ProductionState(ConnectivityManager &connManager, GNode &interior) : interior(interior),
@@ -26,6 +27,9 @@ public:
                                               : galois::optional<EdgeData>());//TODO: Probably copying
             lengths.push_back(maybeEdgeIter ? edgesData[i].get().getLength() : -1);
             verticesData.push_back(graph.getData(vertices[i]));//TODO: Probably copying
+            if (!maybeEdgeIter) {
+                brokenEdges.push_back(i);
+            }
         }
     }
 
@@ -40,22 +44,11 @@ public:
     }
 
     int getAnyBrokenEdge() const {
-        const vector<int> &brokenEdges = getBrokenEdges();
         if (!brokenEdges.empty()) {
             return brokenEdges[0];
         } else {
             return -1;
         }
-    }
-
-    std::vector<int> getBrokenEdges() const {
-        std::vector<int> result;
-        for (int i = 0; i < 3; ++i) {
-            if (!edgesIterators[i]) {
-                result.push_back(i);
-            }
-        }
-        return result;
     }
 
     std::vector<int> getLongestEdgesIncludingBrokenOnes() const {
@@ -94,6 +87,10 @@ public:
 
     const vector<optional<EdgeIterator>> &getEdgesIterators() const {
         return edgesIterators;
+    }
+
+    const vector<int> &getBrokenEdges() const {
+        return brokenEdges;
     }
 };
 

@@ -16,28 +16,6 @@ public:
         return vertices;
     }
 
-    GNode getNeighbourN(GNode node, int n) const {
-//        std::vector<GNode> vertices;
-        int i = 0;
-        Graph::edge_iterator ii = graph.edge_begin(node);
-        for (Graph::edge_iterator ee = graph.edge_end(node); ii != ee || i < n; ++ii) {
-//            vertices.push_back(graph.getEdgeDst(ii));
-        }
-        return GNode(ii->first());
-    }
-
-    GNode getEdgeSrc(const EdgeIterator &edge, GNode neighbour) {
-        for (GNode candidate : getNeighbours(neighbour)) {
-            for (const EdgeIterator &maybeTheEdge : graph.edges(candidate)) {
-                if (maybeTheEdge == edge) {
-                    return candidate;
-                }
-            }
-        }
-        std::cerr << "Cannot find EdgeSrc." << std::endl;
-        return nullptr;
-    }
-
     std::vector<optional<EdgeIterator>> getTriangleEdges(std::vector<GNode> vertices) {
         std::vector<optional<EdgeIterator>> edges;
         for (int i = 0; i < 3; i++) {
@@ -60,13 +38,6 @@ public:
         }
     }
 
-    EdgeIterator getLongestEdge(GNode node, std::vector<optional<EdgeIterator>> edges) {
-
-        return std::max_element(edges.begin(), edges.end(), [&](optional<EdgeIterator> &a, optional<EdgeIterator> &b) {
-            return graph.getEdgeData(a.get()).getLength() < graph.getEdgeData(b.get()).getLength();
-        })->get();
-    }
-
     bool hasBrokenEdge(const std::vector<optional<EdgeIterator>> &edges) const {
         return countBrokenEdges(edges) > 0;
     }
@@ -81,7 +52,7 @@ public:
         return counter;
     }
 
-    std::pair<GNode, EdgeIterator> findSrc(EdgeData edge) const {
+    std::pair<GNode, EdgeIterator> findSrc(EdgeData edge) const { //TODO: Optimization required
         std::pair<GNode, EdgeIterator> result;
         for (auto n : graph) {
             for (const auto &e : graph.edges(n)) {
@@ -94,7 +65,7 @@ public:
         return result;
     }
 
-    optional<GNode> findNodeBetween(const GNode &node1, const GNode &node2) const {
+    optional<GNode> findNodeBetween(const GNode &node1, const GNode &node2) const { //TODO: Consider optimization
         Coordinates lookThere = (node1->getData().getCoords() + node2->getData().getCoords()) / 2.;
         std::vector<GNode> neighbours1 = getNeighbours(node1);
         std::vector<GNode> neighbours2 = getNeighbours(node2);
@@ -116,14 +87,15 @@ public:
         return node;
     }
 
-    void createInterior(const GNode &node1, const GNode &node2, const GNode &node3, galois::UserContext<GNode> &ctx) const {
-        NodeData secondInteriorData = NodeData{true, false};
-        auto secondInterior = createNode(secondInteriorData, ctx);
+    void createInterior(const GNode &node1, const GNode &node2, const GNode &node3,
+                        galois::UserContext<GNode> &ctx) const {
+        NodeData interiorData = NodeData{true, false};
+        auto interior = createNode(interiorData, ctx);
 
-        graph.addEdge(secondInterior, node1);
-        graph.addEdge(secondInterior, node2);
-        graph.addEdge(secondInterior, node3);
-        secondInterior->getData().setCoords(
+        graph.addEdge(interior, node1);
+        graph.addEdge(interior, node2);
+        graph.addEdge(interior, node3);
+        interior->getData().setCoords(
                 (node1->getData().getCoords() + node2->getData().getCoords() + node3->getData().getCoords()) / 3.);
     }
 
