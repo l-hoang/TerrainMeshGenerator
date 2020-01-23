@@ -3,6 +3,7 @@
 #endif()
 
 app(graphgrammar GraphGrammar.cpp)
+app(graphgrammarTest test/TestMain.cpp)
 
 #add_test_scale(small1 delaunayrefinement "${BASEINPUT}/reference/meshes/r10k.1")
 #add_test_scale(small2 delaunayrefinement "${BASEINPUT}/meshes/250k.2")

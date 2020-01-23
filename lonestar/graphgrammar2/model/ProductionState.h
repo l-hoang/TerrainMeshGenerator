@@ -1,6 +1,9 @@
 #ifndef GALOIS_PRODUCTIONSTATE_H
 #define GALOIS_PRODUCTIONSTATE_H
 
+#include "Graph.h"
+#include "../utils/ConnectivityManager.h"
+
 using std::vector;
 
 class ProductionState {

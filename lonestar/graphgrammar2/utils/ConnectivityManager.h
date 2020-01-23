@@ -2,6 +2,9 @@
 #define GALOIS_CONNECTIVITYMANAGER_H
 
 
+#include <galois/optional.h>
+#include "../model/Graph.h"
+
 class ConnectivityManager {
 private:
     Graph &graph;
@@ -111,7 +114,7 @@ public:
                 (node1->getData().getCoords() + node2->getData().getCoords() + node3->getData().getCoords()) / 3.);
     }
 
-    void createInterior(const GNode &node1, const GNode &node2, const GNode &node3) const {
+    GNode createInterior(const GNode &node1, const GNode &node2, const GNode &node3) const {
         NodeData interiorData = NodeData{true, false};
         auto interior = createNode(interiorData);
 
@@ -120,6 +123,7 @@ public:
         graph.addEdge(interior, node3);
         interior->getData().setCoords(
                 (node1->getData().getCoords() + node2->getData().getCoords() + node3->getData().getCoords()) / 3.);
+        return std::move(interior);
     }
 
     Graph &getGraph() const {
