@@ -37,7 +37,7 @@ public:
             return false;
         }
 
-        logg(pState.getInteriorData(), pState.getVerticesData());
+//        logg(pState.getInteriorData(), pState.getVerticesData());
 
         int edgeToBreak = getEdgeToBreak(pState);
         if (edgeToBreak == -1) {
@@ -45,7 +45,7 @@ public:
         }
 
         breakElementWithoutHangingNode(edgeToBreak, pState, ctx);
-        std::cout << "P1 executed ";
+//        std::cout << "P1 executed ";
 
         return true;
     }

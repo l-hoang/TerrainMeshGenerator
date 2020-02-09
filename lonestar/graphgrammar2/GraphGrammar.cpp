@@ -3,7 +3,9 @@
 #include "model/EdgeData.h"
 #include "model/NodeData.h"
 #include "model/Graph.h"
+#include "model/Map.h"
 #include "productions/Production0.h"
+#include "productions/TerrainConditionChecker.h"
 #include "productions/Production1.h"
 #include "productions/Production2.h"
 #include "productions/Production3.h"
@@ -13,6 +15,7 @@
 #include "utils/MyGraphFormatWriter.h"
 #include "utils/utils.h"
 #include "utils/GraphGenerator.h"
+#include "Readers/SrtmReader.h"
 
 
 static const char *name = "Mesh generator";
@@ -41,13 +44,18 @@ int main(int argc, char **argv) {
 
     MyGraphFormatWriter::writeToFile(graph, "out/graph.mgf");
     system("./display.sh out/graph.mgf");
-    Production0 production0;
-    Production1 production1{graph};
-    Production2 production2{graph};
-    Production3 production3{graph};
-    Production4 production4{graph};
-    Production5 production5{graph};
-    Production6 production6{graph};
+
+    SrtmReader reader;
+    Map * map = reader.read_SRTM(19.5, 50.5, 19.7, 50.3, "data");
+
+    ConnectivityManager connManager{graph};
+    TerrainConditionChecker checker = TerrainConditionChecker(*map);
+    Production1 production1{connManager};
+    Production2 production2{connManager};
+    Production3 production3{connManager};
+    Production4 production4{connManager};
+    Production5 production5{connManager};
+    Production6 production6{connManager};
     int i = 0;
 //    afterStep(0, graph);
     for (int j = 0; j< 5; j++) {
@@ -58,16 +66,13 @@ int main(int argc, char **argv) {
             if (!node->getData().isHyperEdge()) {
                 return;
             }
-            if (production0.execute(node, ctx)) {
+            if (checker.execute(node,100., connManager)) {
 //                afterStep(i, graph);
                 return;
             }
 
         });
         galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto &ctx) {
-            //        if (i>40) {
-            //            return;
-            //        }
             if (!graph.containsNode(node, galois::MethodFlag::WRITE)) {
                 return;
             }
@@ -76,7 +81,7 @@ int main(int argc, char **argv) {
             }
             ConnectivityManager connManager{graph};
             ProductionState pState(connManager, node);
-            std::cout << i++ << ": ";
+//            std::cout << i++ << ": ";
             if (production1.execute(pState, ctx)) {
                 afterStep(i, graph);
                 return;
@@ -109,6 +114,7 @@ int main(int argc, char **argv) {
     MyGraphFormatWriter::writeToFile(graph, "out/graph.mgf");
     system("./display.sh out/graph.mgf");
 
+    delete map;
     return 0;
 }
 
@@ -116,5 +122,5 @@ void afterStep(int i, Graph &graph) {
     auto path = std::string("out/step") + std::to_string(i - 1) + ".mgf";
 //    MyGraphFormatWriter::writeToFile(graph, path);
 //    system((std::string("./display.sh ") + path).c_str());
-    std::cout << std::endl;
+//    std::cout << std::endl;
 }

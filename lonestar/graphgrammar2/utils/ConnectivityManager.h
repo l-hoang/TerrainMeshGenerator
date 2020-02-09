@@ -129,6 +129,14 @@ public:
     Graph &getGraph() const {
         return graph;
     }
+
+    const std::vector<Coordinates> getVerticesCoords(const GNode &node) const {
+        std::vector<Coordinates> result;
+        for (auto neighbour: getNeighbours(node)) {
+            result.push_back(neighbour->getData().getCoords());
+        }
+        return result;
+    }
 };
 
 

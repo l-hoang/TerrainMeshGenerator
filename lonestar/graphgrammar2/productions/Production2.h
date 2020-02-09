@@ -22,7 +22,7 @@ public:
             return false;
         }
 
-        logg(pState.getInteriorData(), pState.getVerticesData());
+//        logg(pState.getInteriorData(), pState.getVerticesData());
 
         int brokenEdge = pState.getAnyBrokenEdge();
         assert(brokenEdge != -1);
@@ -33,7 +33,7 @@ public:
         }
 
         breakElementWithHangingNode(brokenEdge, pState, ctx);
-        std::cout << "P2 executed ";
+//        std::cout << "P2 executed ";
         return true;
     }
 

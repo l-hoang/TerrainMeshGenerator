@@ -29,14 +29,14 @@ public:
             return false;
         }
 
-        logg(pState.getInteriorData(), pState.getVerticesData());
+//        logg(pState.getInteriorData(), pState.getVerticesData());
 
         const vector<int> &longestEdges = pState.getLongestEdges();
 
         for (int longest : longestEdges) {
             if (pState.getEdgesData()[longest].get().isBorder()) {
                 breakElementWithoutHangingNode(longest, pState, ctx);
-                std::cout << "P3 executed ";
+//                std::cout << "P3 executed ";
                 return true;
             }
         }
@@ -45,7 +45,7 @@ public:
                 !pState.getVerticesData()[getEdgeVertices(longest).second].isHanging()) {
 
                 breakElementWithoutHangingNode(longest, pState, ctx);
-                std::cout << "P3 executed ";
+//                std::cout << "P3 executed ";
                 return true;
             }
         }
