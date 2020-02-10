@@ -2,7 +2,8 @@
 #  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
 #endif()
 
-app(graphgrammar GraphGrammar.cpp model/Map.cpp Readers/SrtmReader.cpp libmgrs/mgrs.c libmgrs/polarst.c libmgrs/tranmerc.c libmgrs/utm.c libmgrs/ups.c utils/Utils.cpp)
+app(graphgrammar src/GraphGrammar.cpp src/model/Map.cpp src/Readers/SrtmReader.cpp src/libmgrs/mgrs.c
+        src/libmgrs/polarst.c src/libmgrs/tranmerc.c src/libmgrs/utm.c src/libmgrs/ups.c src/utils/Utils.cpp)
 app(graphgrammarTest test/TestMain.cpp)
 
 #add_test_scale(small1 delaunayrefinement "${BASEINPUT}/reference/meshes/r10k.1")

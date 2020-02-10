@@ -57,10 +57,10 @@ public:
 
     std::pair<GNode, EdgeIterator> findSrc(EdgeData edge) const { //TODO: Optimization required
         std::pair<GNode, EdgeIterator> result;
-        for (auto n : graph) {
-            for (const auto &e : graph.edges(n)) {
+        for (auto node : graph) {
+            for (const auto &e : graph.edges(node)) {
                 if (graph.getEdgeData(e).getMiddlePoint() == edge.getMiddlePoint()) {
-                    result.first = n;
+                    result.first = node;
                     result.second = e;
                 }
             }
@@ -97,9 +97,12 @@ public:
 
     void createEdge(GNode &node1, GNode &node2, bool border, const Coordinates &middlePoint, double length) {
         graph.addEdge(node1, node2);
-        graph.getEdgeData(graph.findEdge(node1, node2)).setBorder(border);
-        graph.getEdgeData(graph.findEdge(node1, node2)).setMiddlePoint(middlePoint);
-        graph.getEdgeData(graph.findEdge(node1, node2)).setLength(length);
+        const EdgeIterator &edge = graph.findEdge(node1, node2);
+        graph.getEdgeData(edge).setBorder(border);
+        graph.getEdgeData(edge).setMiddlePoint(middlePoint);
+        graph.getEdgeData(edge).setLength(length);
+        graph.getEdgeData(edge).setVertex1(&node1);
+        graph.getEdgeData(edge).setVertex2(&node2);
     }
 
     void createInterior(const GNode &node1, const GNode &node2, const GNode &node3,

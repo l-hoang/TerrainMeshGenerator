@@ -1,8 +1,8 @@
 #include "../catch.hpp"
-#include "../../productions/Production1.h"
-#include "../../model/Graph.h"
-#include "../../model/Coordinates.h"
-#include "../../model/NodeData.h"
+#include "../../src/productions/Production1.h"
+#include "../../src/model/Graph.h"
+#include "../../src/model/Coordinates.h"
+#include "../../src/model/NodeData.h"
 #include "../testUtils.cpp"
 
 

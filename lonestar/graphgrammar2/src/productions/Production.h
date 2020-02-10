@@ -83,6 +83,8 @@ private:
                     (newNodeData.getCoords().getY() + vertexData.getCoords().getY()) / 2.,
                     (newNodeData.getCoords().getZ() + vertexData.getCoords().getZ()) / 2.);
             graph.getEdgeData(edge).setLength(newNodeData.getCoords().dist(vertexData.getCoords()));
+            graph.getEdgeData(edge).setVertex1(&newNode);
+            graph.getEdgeData(edge).setVertex1(&(pState.getVertices()[i]));
         }
         return newNode;
     }
@@ -116,8 +118,9 @@ private:
         const EdgeIterator &newEdge = graph.addEdge(node1, node2);
         graph.getEdgeData(newEdge).setBorder(border);
         graph.getEdgeData(newEdge).setLength(length);
-        graph.getEdgeData(newEdge).setMiddlePoint(
-                middlePoint);
+        graph.getEdgeData(newEdge).setMiddlePoint(middlePoint);
+        graph.getEdgeData(newEdge).setVertex1(&node1);
+        graph.getEdgeData(newEdge).setVertex2(&node2);
     }
 
     int getNeutralVertex(int edgeToBreak) const {
