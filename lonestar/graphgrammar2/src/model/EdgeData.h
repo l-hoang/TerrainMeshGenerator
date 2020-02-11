@@ -12,18 +12,16 @@ private:
     bool border;
     double length;
     Coordinates middlePoint;
-    const GNode *vertex1;
-    const GNode *vertex2;
+    const GNode *src;
+    const GNode *dst;
 
 public:
-    EdgeData() : border(false), length(-1), middlePoint(), vertex1(nullptr), vertex2(nullptr) {};
+    EdgeData() : border(false), length(-1), middlePoint(), src(nullptr), dst(nullptr) {};
 
-    EdgeData(bool border, double length, Coordinates middlePoint, GNode *vertex1, GNode *vertex2) : border(border),
-                                                                                                    length(length),
-                                                                                                    middlePoint(
-                                                                                                            middlePoint),
-                                                                                                    vertex1(vertex1),
-                                                                                                    vertex2(vertex2) {}
+    EdgeData(bool border, double length, Coordinates middlePoint, GNode *src, GNode *dst) : border(border),
+                                                                                            length(length),
+                                                                                            middlePoint(middlePoint),
+                                                                                            src(src), dst(dst) {}
 
     bool isBorder() const {
         return border;
@@ -53,20 +51,20 @@ public:
         EdgeData::middlePoint.setXYZ(x, y, z);
     }
 
-    const GNode *getVertex1() const {
-        return vertex1;
+    const GNode *getSrc() const {
+        return src;
     }
 
-    void setVertex1(const GNode *vertex1) {
-        EdgeData::vertex1 = vertex1;
+    void setSrc(const GNode *src) {
+        EdgeData::src = src;
     }
 
-    const GNode *getVertex2() const {
-        return vertex2;
+    const GNode *getDst() const {
+        return dst;
     }
 
-    void setVertex2(const GNode *vertex2) {
-        EdgeData::vertex2 = vertex2;
+    void setDst(const GNode *dst) {
+        EdgeData::dst = dst;
     }
 };
 

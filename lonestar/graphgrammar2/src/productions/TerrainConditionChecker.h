@@ -73,7 +73,7 @@ private:
                     for (int k = 0; k < 3; ++k) {
                         height += barycentric_point[k] * verticesCoords[k].getZ();
                     }
-                    if (fabs(height - get_height(i, j)) > tolerance) {
+                    if (fabs(height - map.get_height(i, j)) > tolerance) {
                         return true;
                     }
                 }
@@ -96,113 +96,11 @@ private:
         return !greater(barycentric_coords[0] + barycentric_coords[1] + barycentric_coords[2], 1.);
     }
 
-    double
-    get_height(double lon, double lat)
-    {
-        double x, y;
-        //convert to geodetic if required
-        if (map.isUtm()) {
-            if (Convert_UTM_To_Geodetic(map.getZone(), map.getHemisphere(), lon, lat, &y, &x)) {
-                fprintf(stderr, "Error during conversion.\n");
-                exit(18);
-            }
-            x = r2d(x);
-            y = r2d(y);
-        } else {
-            x = lon;
-            y = lat;
-        }
-        //using bilinear interpolation
-        double top_left = get_height_wo_interpol(x, y, 1);
-        double top_right = get_height_wo_interpol(x, y, 2);
-        double bottom_right = get_height_wo_interpol(x, y, 3);
-        double bottom_left = get_height_wo_interpol(x, y, 4);;
-
-        double x_fract = (x - map.getWestBorder()) / map.getCellWidth() -
-                         floor2((x - map.getWestBorder()) / map.getCellWidth() );
-        double y_fract = fabs(y - map.getNorthBorder()) / map.getCellLength() -
-                         floor2(fabs(y - map.getNorthBorder()) / map.getCellLength() );
-
-        double height = 0.;
-        height += top_left * (1 - x_fract) * (1 - y_fract);
-        height += top_right * x_fract * (1 - y_fract);
-        height += bottom_right * x_fract * y_fract;
-        height += bottom_left * (1 - x_fract) * y_fract;
-
-        return height;
-    }
-
-    //corner: 1 - top_left, 2 - top_right, 3 - bottom_right, 4 - bottom_left
-    double
-    get_height_wo_interpol(double lon, double lat, int corner)
-    {
-        double (*fun1)(double);
-        double (*fun2)(double);
-        switch (corner) {
-            case 1:
-                fun1 = floor2;
-                fun2 = floor2;
-                break;
-            case 2:
-                fun1 = floor2;
-                fun2 = ceil2;
-                break;
-            case 3:
-                fun1 = ceil2;
-                fun2 = ceil2;
-                break;
-            case 4:
-                fun1 = ceil2;
-                fun2 = floor2;
-                break;
-            default:
-                return MINDOUBLE;
-        }
-
-        int y, x;
-        if (fun1((map.getNorthBorder() - lat) / map.getCellLength()) > map.getLength() - 1) {
-            y = (int) (map.getLength() - 1);
-        } else if (fun1((map.getNorthBorder() - lat) / map.getCellLength()) < 0) {
-            y = 0;
-        } else {
-            y = (int) fun1((map.getNorthBorder() - lat) / map.getCellLength());
-        }
-        if (fun2((lon - map.getWestBorder()) / map.getCellWidth()) > map.getWidth() - 1) {
-            x = (int) (map.getWidth() - 1);
-        } else if (fun2((lon - map.getWestBorder()) / map.getCellWidth()) < 0) {
-            x = 0;
-        } else {
-            x = (int) fun2((lon - map.getWestBorder()) / map.getCellWidth());
-        }
-        return map.getData()[y][x];
-    }
 
     double
     get_area(const Coordinates &a, const Coordinates &b, const Coordinates &c)
     {
         return 0.5 * fabs((b.getX() - a.getX()) * (c.getY() - a.getY()) - (b.getY() - a.getY()) * (c.getX() - a.getX()));
-    }
-
-    double
-    r2d(double radians)
-    {
-        return radians * 180 / M_PI;
-    }
-
-    static double
-    floor2(double a)
-    {
-        double b = (int) a;
-        if (!(!greater(b, a) && greater(b+1, a))) {
-            ++b;
-        }
-        return b;
-    }
-
-    static double
-    ceil2(double a)
-    {
-        return floor2(a) + 1;
     }
 
 };

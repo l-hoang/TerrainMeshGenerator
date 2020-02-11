@@ -25,10 +25,11 @@ static const char *url = "mesh_generator";
 void afterStep(int i, Graph &graph);
 
 int main(int argc, char **argv) {
+    bool version2D = true;
+
     galois::SharedMemSys G;
     LonestarStart(argc, argv, name, desc, url);//---------
     Graph graph{};
-    GraphGenerator::generateSampleGraph(graph);
 
     galois::reportPageAlloc("MeminfoPre1");
     // Tighter upper bound for pre-alloc, useful for machines with limited memory,
@@ -41,12 +42,11 @@ int main(int argc, char **argv) {
 
     galois::reportPageAlloc("MeminfoPre2");
 
-
-    MyGraphFormatWriter::writeToFile(graph, "out/graph.mgf");
-    system("./display.sh out/graph.mgf");
-
     SrtmReader reader;
     Map * map = reader.read_SRTM(19.5, 50.5, 19.7, 50.3, "data");
+    GraphGenerator::generateSampleGraphWithData(graph, *map, 19.5, 50.5, 19.7, 50.3, version2D);
+    MyGraphFormatWriter::writeToFile(graph, "out/graph.mgf");
+    system("./display.sh out/graph.mgf");
 
     ConnectivityManager connManager{graph};
     TerrainConditionChecker checker = TerrainConditionChecker(*map);
@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
                 return;
             }
             ConnectivityManager connManager{graph};
-            ProductionState pState(connManager, node);
+            ProductionState pState(connManager, node, version2D);
 //            std::cout << i++ << ": ";
             if (production1.execute(pState, ctx)) {
                 afterStep(i, graph);
@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
 
 void afterStep(int i, Graph &graph) {
     auto path = std::string("out/step") + std::to_string(i - 1) + ".mgf";
-//    MyGraphFormatWriter::writeToFile(graph, path);
-//    system((std::string("./display.sh ") + path).c_str());
+    MyGraphFormatWriter::writeToFile(graph, path);
+    system((std::string("./display.sh ") + path).c_str());
 //    std::cout << std::endl;
 }

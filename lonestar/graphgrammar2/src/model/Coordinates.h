@@ -44,12 +44,21 @@ public:
         Coordinates::z = z;
     }
 
-    std::string toString() const {
-        return std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(z);
-    }
-
     double dist(const Coordinates &rhs) const {
         return sqrt(pow(x - rhs.x, 2) + pow(y - rhs.y, 2) + pow(z - rhs.z, 2));
+    }
+
+    double dist2D(const Coordinates &rhs) const {
+        return sqrt(pow(x - rhs.x, 2) + pow(y - rhs.y, 2));
+    }
+
+    bool isXYequal(const Coordinates &rhs) {
+        return equals(x, rhs.x) &&
+               equals(y, rhs.y);
+    }
+
+    std::string toString() const {
+        return std::to_string(x) + " " + std::to_string(y) + " " + std::to_string(z);
     }
 
     Coordinates operator+(const Coordinates &rhs) const {

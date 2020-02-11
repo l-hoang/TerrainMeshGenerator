@@ -16,20 +16,20 @@ private:
     vector<galois::optional<EdgeData>> edgesData;
     vector<double> lengths;
     vector<int> brokenEdges;
+    bool version2D;
 
 public:
-    ProductionState(ConnectivityManager &connManager, GNode &interior) : interior(interior),
-                                                                         interiorData(interior->getData()),
-                                                                         vertices(connManager.getNeighbours(interior)),
-                                                                         edgesIterators(connManager.getTriangleEdges(
-                                                                                 vertices)) {
+    ProductionState(ConnectivityManager &connManager, GNode &interior,
+                    bool version2D) : interior(interior), interiorData(interior->getData()),
+                                      vertices(connManager.getNeighbours(interior)),
+                                      edgesIterators(connManager.getTriangleEdges(vertices)), version2D(version2D) {
         Graph &graph = connManager.getGraph();
         for (int i = 0; i < 3; ++i) {
             auto maybeEdgeIter = edgesIterators[i];
             edgesData.push_back(maybeEdgeIter ? graph.getEdgeData(maybeEdgeIter.get())
-                                              : galois::optional<EdgeData>());//TODO: Probably copying
+                                              : galois::optional<EdgeData>());//TODO: Look for possible optimization
             lengths.push_back(maybeEdgeIter ? edgesData[i].get().getLength() : -1);
-            verticesData.push_back(graph.getData(vertices[i]));//TODO: Probably copying
+            verticesData.push_back(graph.getData(vertices[i]));//TODO: Look for possible optimization
             if (!maybeEdgeIter) {
                 brokenEdges.push_back(i);
             }
@@ -57,11 +57,14 @@ public:
     std::vector<int> getLongestEdgesIncludingBrokenOnes() const {
         std::vector<double> verticesDistances(3);
         for (int i = 0; i < 3; ++i) {
-            verticesDistances[i] = verticesData[i].getCoords().dist(verticesData[(i + 1) % 3].getCoords());
+            if (!version2D) {
+                verticesDistances[i] = verticesData[i].getCoords().dist(verticesData[(i + 1) % 3].getCoords());
+            } else {
+                verticesDistances[i] = verticesData[i].getCoords().dist2D(verticesData[(i + 1) % 3].getCoords());
+            }
         }
         return indexesOfMaxElems(verticesDistances);
     }
-
 
 
     GNode &getInterior() const {
@@ -94,6 +97,10 @@ public:
 
     const vector<int> &getBrokenEdges() const {
         return brokenEdges;
+    }
+
+    bool isVersion2D() const {
+        return version2D;
     }
 };
 

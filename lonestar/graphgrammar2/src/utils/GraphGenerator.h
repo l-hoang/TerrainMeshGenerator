@@ -22,6 +22,64 @@ public:
         connManager.createInterior(nodes[0], nodes[3], nodes[2]);
     }
 
+    static void generateSampleGraphWithData(Graph &graph, Map &map, const double west_border, const double north_border,
+                                            const double east_border, const double south_border, bool version2D) {
+        vector<GNode> nodes;
+        ConnectivityManager connManager{graph};
+        nodes.push_back(connManager.createNode(
+                NodeData{false, Coordinates{west_border, south_border, map.get_height(west_border, south_border)},
+                         false}));
+        nodes.push_back(connManager.createNode(
+                NodeData{false, Coordinates{west_border, north_border, map.get_height(west_border, north_border)},
+                         false}));
+        nodes.push_back(connManager.createNode(
+                NodeData{false, Coordinates{east_border, south_border, map.get_height(east_border, south_border)},
+                         false}));
+        nodes.push_back(connManager.createNode(
+                NodeData{false, Coordinates{east_border, north_border, map.get_height(east_border, north_border)},
+                         false}));
+
+        double length1 = 0;
+        double length2 = 0;
+        double length3 = 0;
+        double length4 = 0;
+        double length5 = 0;
+        if (!version2D) {
+            length1 = nodes[0]->getData().getCoords().dist(nodes[1]->getData().getCoords());
+            length2 = nodes[1]->getData().getCoords().dist(nodes[3]->getData().getCoords());
+            length3 = nodes[2]->getData().getCoords().dist(nodes[3]->getData().getCoords());
+            length4 = nodes[0]->getData().getCoords().dist(nodes[2]->getData().getCoords());
+            length5 = nodes[3]->getData().getCoords().dist(nodes[0]->getData().getCoords());
+        } else {
+            length1 = nodes[0]->getData().getCoords().dist2D(nodes[1]->getData().getCoords());
+            length2 = nodes[1]->getData().getCoords().dist2D(nodes[3]->getData().getCoords());
+            length3 = nodes[2]->getData().getCoords().dist2D(nodes[3]->getData().getCoords());
+            length4 = nodes[0]->getData().getCoords().dist2D(nodes[2]->getData().getCoords());
+            length5 = nodes[3]->getData().getCoords().dist2D(nodes[0]->getData().getCoords());
+        }
+        connManager.createEdge(nodes[0], nodes[1], true, Coordinates{west_border, (north_border + south_border) / 2.,
+                                                                     map.get_height(west_border,
+                                                                                    (north_border + south_border) /
+                                                                                    2.)}, length1);
+        connManager.createEdge(nodes[1], nodes[3], true, Coordinates{(west_border + east_border) / 2., north_border,
+                                                                     map.get_height((west_border + east_border) / 2.,
+                                                                                    north_border)}, length2);
+        connManager.createEdge(nodes[2], nodes[3], true, Coordinates{east_border, (north_border + south_border) / 2.,
+                                                                     map.get_height(east_border,
+                                                                                    (north_border + south_border) /
+                                                                                    2.)}, length3);
+        connManager.createEdge(nodes[0], nodes[2], true, Coordinates{(west_border + east_border) / 2., south_border,
+                                                                     map.get_height((west_border + east_border) / 2.,
+                                                                                    south_border)}, length4);
+        connManager.createEdge(nodes[3], nodes[0], false,
+                               Coordinates{(west_border + east_border) / 2., (north_border + south_border) / 2.,
+                                           map.get_height((west_border + east_border) / 2.,
+                                                          (north_border + south_border) / 2.)}, length5);
+
+        connManager.createInterior(nodes[0], nodes[1], nodes[3]);
+        connManager.createInterior(nodes[0], nodes[3], nodes[2]);
+    }
+
     static void generateSampleGraph3(Graph &graph) {
         GNode node1, node2, node3, node4, node5, node6, hEdge1, hEdge2, hEdge3, hEdge4;
         node1 = graph.createNode(NodeData{false, Coordinates{0, 0, 0}, false});

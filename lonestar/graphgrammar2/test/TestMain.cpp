@@ -4,5 +4,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include "productions/Production1Test.cpp"
+#include "utils/ConnectivityManagerTest.cpp"
+#include "model/ProductionStateTest.cpp"
 
 #endif //GALOIS_TESTMAIN_H

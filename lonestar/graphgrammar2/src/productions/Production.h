@@ -68,6 +68,10 @@ private:
         bool breakingOnBorder = edgesData[edgeToBreak].get().isBorder();
         int neutralVertex = getNeutralVertex(edgeToBreak);
 
+//        const EdgeIterator &edge = pState.getEdgesIterators()[edgeToBreak].get();
+//        graph.removeEdge(*(graph.getEdgeData(edge).getSrc()), edge);
+
+//        auto edgePair = connManager.findSrc(pState.getEdgesIterators()[edgeToBreak].get());
         auto edgePair = connManager.findSrc(edgesData[edgeToBreak].get());
         graph.removeEdge(edgePair.first, edgePair.second);
         NodeData newNodeData = NodeData{false, edgesData[edgeToBreak].get().getMiddlePoint(), !breakingOnBorder};
@@ -82,9 +86,13 @@ private:
                     (newNodeData.getCoords().getX() + vertexData.getCoords().getX()) / 2.,
                     (newNodeData.getCoords().getY() + vertexData.getCoords().getY()) / 2.,
                     (newNodeData.getCoords().getZ() + vertexData.getCoords().getZ()) / 2.);
-            graph.getEdgeData(edge).setLength(newNodeData.getCoords().dist(vertexData.getCoords()));
-            graph.getEdgeData(edge).setVertex1(&newNode);
-            graph.getEdgeData(edge).setVertex1(&(pState.getVertices()[i]));
+            if (!pState.isVersion2D()) {
+                graph.getEdgeData(edge).setLength(newNodeData.getCoords().dist(vertexData.getCoords()));
+            } else {
+                graph.getEdgeData(edge).setLength(newNodeData.getCoords().dist2D(vertexData.getCoords()));
+            }
+            graph.getEdgeData(edge).setSrc(&newNode);
+            graph.getEdgeData(edge).setDst(&(pState.getVertices()[i]));
         }
         return newNode;
     }
@@ -95,8 +103,14 @@ private:
         Graph &graph = connManager.getGraph();
         int neutralVertex = getNeutralVertex(edgeToBreak);
         NodeData hNodeData = hangingNode->getData();
+        double length = 0;
+        if (!pState.isVersion2D()) {
+            length = hNodeData.getCoords().dist(pState.getVerticesData()[neutralVertex].getCoords());
+        } else {
+            length = hNodeData.getCoords().dist2D(pState.getVerticesData()[neutralVertex].getCoords());
+        }
         addEdge(graph, hangingNode, pState.getVertices()[neutralVertex], false,
-                hNodeData.getCoords().dist(pState.getVerticesData()[neutralVertex].getCoords()),
+                length,
                 (hNodeData.getCoords() + pState.getVerticesData()[neutralVertex].getCoords()) / 2);
 
         connManager.createInterior(hangingNode, pState.getVertices()[neutralVertex],
@@ -119,8 +133,8 @@ private:
         graph.getEdgeData(newEdge).setBorder(border);
         graph.getEdgeData(newEdge).setLength(length);
         graph.getEdgeData(newEdge).setMiddlePoint(middlePoint);
-        graph.getEdgeData(newEdge).setVertex1(&node1);
-        graph.getEdgeData(newEdge).setVertex2(&node2);
+        graph.getEdgeData(newEdge).setSrc(&node1);
+        graph.getEdgeData(newEdge).setDst(&node2);
     }
 
     int getNeutralVertex(int edgeToBreak) const {

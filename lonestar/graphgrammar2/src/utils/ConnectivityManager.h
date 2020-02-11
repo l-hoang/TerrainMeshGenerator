@@ -55,7 +55,12 @@ public:
         return counter;
     }
 
-    std::pair<GNode, EdgeIterator> findSrc(EdgeData edge) const { //TODO: Optimization required
+    std::pair<GNode, EdgeIterator> findSrc(const EdgeIterator &edge) const {
+        std::pair<GNode, EdgeIterator> result(*(graph.getEdgeData(edge).getSrc()), edge);
+        return result;
+    }
+
+    std::pair<GNode, EdgeIterator> findSrc(EdgeData edge) const { //Terribly slow version
         std::pair<GNode, EdgeIterator> result;
         for (auto node : graph) {
             for (const auto &e : graph.edges(node)) {
@@ -69,13 +74,14 @@ public:
     }
 
     optional<GNode> findNodeBetween(const GNode &node1, const GNode &node2) const { //TODO: Consider optimization
-        Coordinates lookThere = (node1->getData().getCoords() + node2->getData().getCoords()) / 2.;
+        Coordinates expectedLocation = (node1->getData().getCoords() + node2->getData().getCoords()) / 2.;
         std::vector<GNode> neighbours1 = getNeighbours(node1);
         std::vector<GNode> neighbours2 = getNeighbours(node2);
         for (GNode &iNode : neighbours1) {
             auto iNodeData = graph.getData(iNode);
             for (GNode &jNode : neighbours2) {
-                if (iNodeData.getCoords() == graph.getData(jNode).getCoords() && iNodeData.getCoords() == lookThere) {
+                if (iNode == jNode &&
+                    iNodeData.getCoords().isXYequal(expectedLocation)) {
                     return optional<GNode>(iNode);
                 }
             }
@@ -101,8 +107,8 @@ public:
         graph.getEdgeData(edge).setBorder(border);
         graph.getEdgeData(edge).setMiddlePoint(middlePoint);
         graph.getEdgeData(edge).setLength(length);
-        graph.getEdgeData(edge).setVertex1(&node1);
-        graph.getEdgeData(edge).setVertex2(&node2);
+        graph.getEdgeData(edge).setSrc(&node1);
+        graph.getEdgeData(edge).setSrc(&node2);
     }
 
     void createInterior(const GNode &node1, const GNode &node2, const GNode &node3,

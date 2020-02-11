@@ -8,7 +8,7 @@ include_directories(BEFORE
   ${CMAKE_CURRENT_BINARY_DIR}/../libllvm/include
 )
 
-add_library(lonestar STATIC src/BoilerPlate.cpp)
+add_library(lonestar STATIC src/BoilerPlate.cpp graphgrammar2/test/model/ProductionStateTest.cpp)
 target_include_directories(lonestar PUBLIC 
   ${CMAKE_SOURCE_DIR}/libgalois/include
   ${CMAKE_SOURCE_DIR}/libgalois/experimental/include

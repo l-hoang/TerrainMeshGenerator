@@ -26,17 +26,20 @@ private:
 
     char hemisphere;
 
+    double get_height_wo_interpol(double lon, double lat, int corner);
+
 public:
     Map(double **data, size_t width, size_t length, double cellWidth, double cellLength) : width(width),
                                                                                            length(length),
                                                                                            cell_width(cellWidth),
-                                                                                           cell_length(
-                                                                                                   cellLength),
-                                                                                           data(data) {}
+                                                                                           cell_length(cellLength),
+                                                                                           data(data), utm(false) {}
 
     static double **init_map_data(size_t rows, size_t cols);
 
     void print_map();
+
+    double get_height(double lon, double lat);
 
     size_t getWidth() const {
         return width;
