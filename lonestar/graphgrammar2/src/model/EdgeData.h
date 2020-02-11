@@ -12,16 +12,13 @@ private:
     bool border;
     double length;
     Coordinates middlePoint;
-    const GNode *src;
-    const GNode *dst;
 
 public:
-    EdgeData() : border(false), length(-1), middlePoint(), src(nullptr), dst(nullptr) {};
+    EdgeData() : border(false), length(-1), middlePoint() {};
 
     EdgeData(bool border, double length, Coordinates middlePoint, GNode *src, GNode *dst) : border(border),
                                                                                             length(length),
-                                                                                            middlePoint(middlePoint),
-                                                                                            src(src), dst(dst) {}
+                                                                                            middlePoint(middlePoint) {}
 
     bool isBorder() const {
         return border;
@@ -49,22 +46,6 @@ public:
 
     void setMiddlePoint(const double x, const double y, const double z) {
         EdgeData::middlePoint.setXYZ(x, y, z);
-    }
-
-    const GNode *getSrc() const {
-        return src;
-    }
-
-    void setSrc(const GNode *src) {
-        EdgeData::src = src;
-    }
-
-    const GNode *getDst() const {
-        return dst;
-    }
-
-    void setDst(const GNode *dst) {
-        EdgeData::dst = dst;
     }
 };
 

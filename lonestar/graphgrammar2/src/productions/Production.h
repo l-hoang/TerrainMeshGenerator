@@ -95,8 +95,6 @@ private:
                     (newNodeData.getCoords().getZ() + vertexData.getCoords().getZ()) / 2.);
             graph.getEdgeData(edge).setLength(
                     newNodeData.getCoords().dist(vertexData.getCoords(), pState.isVersion2D()));
-            graph.getEdgeData(edge).setSrc(&newNode);
-            graph.getEdgeData(edge).setDst(&(pState.getVertices()[i]));
         }
         return newNode;
     }
@@ -133,8 +131,6 @@ private:
         graph.getEdgeData(newEdge).setBorder(border);
         graph.getEdgeData(newEdge).setLength(length);
         graph.getEdgeData(newEdge).setMiddlePoint(middlePoint);
-        graph.getEdgeData(newEdge).setSrc(&node1);
-        graph.getEdgeData(newEdge).setDst(&node2);
     }
 };
 
