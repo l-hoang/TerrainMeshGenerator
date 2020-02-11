@@ -4,7 +4,6 @@
 #include "model/NodeData.h"
 #include "model/Graph.h"
 #include "model/Map.h"
-#include "productions/Production0.h"
 #include "productions/TerrainConditionChecker.h"
 #include "productions/Production1.h"
 #include "productions/Production2.h"
@@ -16,19 +15,17 @@
 #include "utils/utils.h"
 #include "utils/GraphGenerator.h"
 #include "Readers/SrtmReader.h"
+#include "utils/Config.h"
 
 
 static const char *name = "Mesh generator";
 static const char *desc = "...";
 static const char *url = "mesh_generator";
 
-static const int STEPS = 10;
-static const bool VERSION2D = false;
-
 void afterStep(int i, Graph &graph);
 
 int main(int argc, char **argv) {
-    bool version2D = true;
+    Config config = Config::parse_arguments(argc, argv);
 
     galois::SharedMemSys G;
     LonestarStart(argc, argv, name, desc, url);//---------
@@ -48,7 +45,7 @@ int main(int argc, char **argv) {
     SrtmReader reader;
     Map * map = reader.read_SRTM(19.5, 50.5, 19.7, 50.3, "data");
 //    GraphGenerator::generateSampleGraph(graph);
-    GraphGenerator::generateSampleGraphWithData(graph, *map, 19.5, 50.5, 19.7, 50.3, VERSION2D);
+    GraphGenerator::generateSampleGraphWithData(graph, *map, 19.5, 50.5, 19.7, 50.3, config.version2D);
 
     ConnectivityManager connManager{graph};
     TerrainConditionChecker checker = TerrainConditionChecker(*map);
@@ -60,7 +57,7 @@ int main(int argc, char **argv) {
     Production6 production6{connManager};
     int i = 0;
 //    afterStep(0, graph);
-    for (int j = 0; j < STEPS; j++) {
+    for (int j = 0; j < config.steps; j++) {
         galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto &ctx) {
             if (!graph.containsNode(node, galois::MethodFlag::WRITE)) {
                 return;
@@ -82,7 +79,7 @@ int main(int argc, char **argv) {
                 return;
             }
             ConnectivityManager connManager{graph};
-            ProductionState pState(connManager, node, version2D);
+            ProductionState pState(connManager, node, config.version2D);
 //            std::cout << i++ << ": ";
             if (production1.execute(pState, ctx)) {
                 afterStep(i, graph);
