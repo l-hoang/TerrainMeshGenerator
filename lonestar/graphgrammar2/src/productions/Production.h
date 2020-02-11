@@ -93,11 +93,8 @@ private:
                     (newNodeData.getCoords().getX() + vertexData.getCoords().getX()) / 2.,
                     (newNodeData.getCoords().getY() + vertexData.getCoords().getY()) / 2.,
                     (newNodeData.getCoords().getZ() + vertexData.getCoords().getZ()) / 2.);
-            if (!pState.isVersion2D()) {
-                graph.getEdgeData(edge).setLength(newNodeData.getCoords().dist(vertexData.getCoords()));
-            } else {
-                graph.getEdgeData(edge).setLength(newNodeData.getCoords().dist2D(vertexData.getCoords()));
-            }
+            graph.getEdgeData(edge).setLength(
+                    newNodeData.getCoords().dist(vertexData.getCoords(), pState.isVersion2D()));
             graph.getEdgeData(edge).setSrc(&newNode);
             graph.getEdgeData(edge).setDst(&(pState.getVertices()[i]));
         }
@@ -111,11 +108,7 @@ private:
         int neutralVertex = getNeutralVertex(edgeToBreak);
         NodeData hNodeData = hangingNode->getData();
         double length = 0;
-        if (!pState.isVersion2D()) {
-            length = hNodeData.getCoords().dist(pState.getVerticesData()[neutralVertex].getCoords());
-        } else {
-            length = hNodeData.getCoords().dist2D(pState.getVerticesData()[neutralVertex].getCoords());
-        }
+        length = hNodeData.getCoords().dist(pState.getVerticesData()[neutralVertex].getCoords(), pState.isVersion2D());
         addEdge(graph, hangingNode, pState.getVertices()[neutralVertex], false,
                 length,
                 (hNodeData.getCoords() + pState.getVerticesData()[neutralVertex].getCoords()) / 2);

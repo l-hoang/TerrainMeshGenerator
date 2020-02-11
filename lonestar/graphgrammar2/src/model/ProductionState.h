@@ -57,11 +57,7 @@ public:
     std::vector<int> getLongestEdgesIncludingBrokenOnes() const {
         std::vector<double> verticesDistances(3);
         for (int i = 0; i < 3; ++i) {
-            if (!version2D) {
-                verticesDistances[i] = verticesData[i].getCoords().dist(verticesData[(i + 1) % 3].getCoords());
-            } else {
-                verticesDistances[i] = verticesData[i].getCoords().dist2D(verticesData[(i + 1) % 3].getCoords());
-            }
+            verticesDistances[i] = verticesData[i].getCoords().dist(verticesData[(i + 1) % 3].getCoords(), version2D);
         }
         return indexesOfMaxElems(verticesDistances);
     }

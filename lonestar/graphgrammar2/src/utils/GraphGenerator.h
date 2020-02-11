@@ -26,6 +26,7 @@ public:
                                             const double east_border, const double south_border, bool version2D) {
         vector<GNode> nodes;
         ConnectivityManager connManager{graph};
+
         nodes.push_back(connManager.createNode(
                 NodeData{false, Coordinates{west_border, south_border, map.get_height(west_border, south_border)},
                          false}));
@@ -39,24 +40,12 @@ public:
                 NodeData{false, Coordinates{east_border, north_border, map.get_height(east_border, north_border)},
                          false}));
 
-        double length1 = 0;
-        double length2 = 0;
-        double length3 = 0;
-        double length4 = 0;
-        double length5 = 0;
-        if (!version2D) {
-            length1 = nodes[0]->getData().getCoords().dist(nodes[1]->getData().getCoords());
-            length2 = nodes[1]->getData().getCoords().dist(nodes[3]->getData().getCoords());
-            length3 = nodes[2]->getData().getCoords().dist(nodes[3]->getData().getCoords());
-            length4 = nodes[0]->getData().getCoords().dist(nodes[2]->getData().getCoords());
-            length5 = nodes[3]->getData().getCoords().dist(nodes[0]->getData().getCoords());
-        } else {
-            length1 = nodes[0]->getData().getCoords().dist2D(nodes[1]->getData().getCoords());
-            length2 = nodes[1]->getData().getCoords().dist2D(nodes[3]->getData().getCoords());
-            length3 = nodes[2]->getData().getCoords().dist2D(nodes[3]->getData().getCoords());
-            length4 = nodes[0]->getData().getCoords().dist2D(nodes[2]->getData().getCoords());
-            length5 = nodes[3]->getData().getCoords().dist2D(nodes[0]->getData().getCoords());
-        }
+        double length1 = nodes[0]->getData().getCoords().dist(nodes[1]->getData().getCoords(), version2D);
+        double length2 = nodes[1]->getData().getCoords().dist(nodes[3]->getData().getCoords(), version2D);
+        double length3 = nodes[2]->getData().getCoords().dist(nodes[3]->getData().getCoords(), version2D);
+        double length4 = nodes[0]->getData().getCoords().dist(nodes[2]->getData().getCoords(), version2D);
+        double length5 = nodes[3]->getData().getCoords().dist(nodes[0]->getData().getCoords(), version2D);
+
         connManager.createEdge(nodes[0], nodes[1], true, Coordinates{west_border, (north_border + south_border) / 2.,
                                                                      map.get_height(west_border,
                                                                                     (north_border + south_border) /

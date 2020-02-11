@@ -22,8 +22,8 @@ static const char *name = "Mesh generator";
 static const char *desc = "...";
 static const char *url = "mesh_generator";
 
-static const int STEPS = 5;
-static const bool VERSION2D = true;
+static const int STEPS = 10;
+static const bool VERSION2D = false;
 
 void afterStep(int i, Graph &graph);
 
@@ -47,8 +47,8 @@ int main(int argc, char **argv) {
 
     SrtmReader reader;
     Map * map = reader.read_SRTM(19.5, 50.5, 19.7, 50.3, "data");
-    GraphGenerator::generateSampleGraph(graph);
-//    GraphGenerator::generateSampleGraphWithData(graph, *map, 19.5, 50.5, 19.7, 50.3, VERSION2D);
+//    GraphGenerator::generateSampleGraph(graph);
+    GraphGenerator::generateSampleGraphWithData(graph, *map, 19.5, 50.5, 19.7, 50.3, VERSION2D);
 
     ConnectivityManager connManager{graph};
     TerrainConditionChecker checker = TerrainConditionChecker(*map);
@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
 }
 
 void afterStep(int i, Graph &graph) {
-    auto path = std::string("out/step") + std::to_string(i - 1) + ".mgf";
+//    auto path = std::string("out/step") + std::to_string((i - 1)) + ".mgf";
 //    MyGraphFormatWriter::writeToFile(graph, path);
 //    system((std::string("./display.sh ") + path).c_str());
 //    std::cout << std::endl;

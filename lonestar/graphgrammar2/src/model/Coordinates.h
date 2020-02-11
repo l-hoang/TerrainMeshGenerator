@@ -44,7 +44,15 @@ public:
         Coordinates::z = z;
     }
 
-    double dist(const Coordinates &rhs) const {
+    double dist(const Coordinates &rhs, bool version2D) {
+        if (version2D) {
+            return dist2D(rhs);
+        } else {
+            return dist3D(rhs);
+        }
+    }
+
+    double dist3D(const Coordinates &rhs) const {
         return sqrt(pow(x - rhs.x, 2) + pow(y - rhs.y, 2) + pow(z - rhs.z, 2));
     }
 
