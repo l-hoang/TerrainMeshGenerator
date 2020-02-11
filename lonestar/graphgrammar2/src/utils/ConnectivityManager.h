@@ -6,8 +6,6 @@
 #include "../model/Graph.h"
 
 class ConnectivityManager {
-private:
-    Graph &graph;
 public:
     ConnectivityManager(Graph &graph) : graph(graph) {}
 
@@ -146,6 +144,23 @@ public:
         }
         return result;
     }
+
+    void removeEdge(const GNode &node1, const GNode &node2) const {
+        const EdgeIterator &edge1 = graph.findEdge(node1, node2);
+        if (edge1.base() != edge1.end()) {
+            graph.removeEdge(node1, edge1);
+            return;
+        }
+        const EdgeIterator &edge2 = graph.findEdge(node2, node1);
+        if (edge2.base() != edge2.end()) {
+            graph.removeEdge(node2, edge2);
+            return;
+        }
+        std::cerr << "Problem in removing an edge.\n";
+    }
+    
+private:
+    Graph &graph;
 };
 
 

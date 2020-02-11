@@ -26,11 +26,11 @@ public:
             return false;
         }
 
-        logg(pState.getInteriorData(), pState.getVerticesData());
+//        logg(pState.getInteriorData(), pState.getVerticesData());
         const vector<int> &brokenEdges = pState.getBrokenEdges();
         if (std::find(brokenEdges.begin(), brokenEdges.end(), longestEdges[0]) == brokenEdges.end()) {
             breakElementWithoutHangingNode(longestEdges[0], pState, ctx);
-            std::cout << "P5 executed ";
+//            std::cout << "P5 executed ";
             return true;
         }
         return false;

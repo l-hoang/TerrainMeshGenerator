@@ -23,9 +23,10 @@ public:
 
         const vector<int> &longestEdges = pState.getLongestEdgesIncludingBrokenOnes();
 
-        logg(pState.getInteriorData(), pState.getVerticesData());
+//        logg(pState.getInteriorData(), pState.getVerticesData());
+
         breakElementWithHangingNode(longestEdges[0], pState, ctx);
-        std::cout << "P5 executed ";
+//        std::cout << "P5 executed ";
         return true;
     }
 

@@ -38,6 +38,10 @@ protected:
         return std::pair<int, int>{edge, (edge + 1) % 3};
     }
 
+    int getNeutralVertex(int edgeToBreak) const {
+        return (edgeToBreak + 2) % 3;
+    }
+
     void breakElementWithHangingNode(int edgeToBreak, ProductionState &pState, galois::UserContext<GNode> &ctx) const {
         GNode hangingNode = getHangingNode(edgeToBreak, pState);
 
@@ -72,8 +76,11 @@ private:
 //        graph.removeEdge(*(graph.getEdgeData(edge).getSrc()), edge);
 
 //        auto edgePair = connManager.findSrc(pState.getEdgesIterators()[edgeToBreak].get());
-        auto edgePair = connManager.findSrc(edgesData[edgeToBreak].get());
-        graph.removeEdge(edgePair.first, edgePair.second);
+//        auto edgePair = connManager.findSrc(edgesData[edgeToBreak].get());
+//        graph.removeEdge(edgePair.first, edgePair.second);
+        const std::pair<int, int> &edgeVertices = getEdgeVertices(edgeToBreak);
+        connManager.removeEdge(pState.getVertices()[edgeVertices.first], pState.getVertices()[edgeVertices.second]);
+
         NodeData newNodeData = NodeData{false, edgesData[edgeToBreak].get().getMiddlePoint(), !breakingOnBorder};
         GNode newNode = graph.createNode(newNodeData);
         graph.addNode(newNode);
@@ -136,11 +143,6 @@ private:
         graph.getEdgeData(newEdge).setSrc(&node1);
         graph.getEdgeData(newEdge).setDst(&node2);
     }
-
-    int getNeutralVertex(int edgeToBreak) const {
-        return (edgeToBreak + 2) % 3;
-    }
-
 };
 
 #endif //GALOIS_PRODUCTION_H

@@ -22,6 +22,9 @@ static const char *name = "Mesh generator";
 static const char *desc = "...";
 static const char *url = "mesh_generator";
 
+static const int STEPS = 5;
+static const bool VERSION2D = true;
+
 void afterStep(int i, Graph &graph);
 
 int main(int argc, char **argv) {
@@ -44,9 +47,8 @@ int main(int argc, char **argv) {
 
     SrtmReader reader;
     Map * map = reader.read_SRTM(19.5, 50.5, 19.7, 50.3, "data");
-    GraphGenerator::generateSampleGraphWithData(graph, *map, 19.5, 50.5, 19.7, 50.3, version2D);
-    MyGraphFormatWriter::writeToFile(graph, "out/graph.mgf");
-    system("./display.sh out/graph.mgf");
+    GraphGenerator::generateSampleGraph(graph);
+//    GraphGenerator::generateSampleGraphWithData(graph, *map, 19.5, 50.5, 19.7, 50.3, VERSION2D);
 
     ConnectivityManager connManager{graph};
     TerrainConditionChecker checker = TerrainConditionChecker(*map);
@@ -58,7 +60,7 @@ int main(int argc, char **argv) {
     Production6 production6{connManager};
     int i = 0;
 //    afterStep(0, graph);
-    for (int j = 0; j< 5; j++) {
+    for (int j = 0; j < STEPS; j++) {
         galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto &ctx) {
             if (!graph.containsNode(node, galois::MethodFlag::WRITE)) {
                 return;
@@ -120,7 +122,7 @@ int main(int argc, char **argv) {
 
 void afterStep(int i, Graph &graph) {
     auto path = std::string("out/step") + std::to_string(i - 1) + ".mgf";
-    MyGraphFormatWriter::writeToFile(graph, path);
-    system((std::string("./display.sh ") + path).c_str());
+//    MyGraphFormatWriter::writeToFile(graph, path);
+//    system((std::string("./display.sh ") + path).c_str());
 //    std::cout << std::endl;
 }
