@@ -53,11 +53,6 @@ public:
         return counter;
     }
 
-//    std::pair<GNode, EdgeIterator> findSrc(const EdgeIterator &edge) const {
-//        std::pair<GNode, EdgeIterator> result(*(graph.getEdgeData(edge).getSrc()), edge);
-//        return result;
-//    }
-
 //    std::pair<GNode, EdgeIterator> findSrc(EdgeData edge) const { //Terribly slow version
 //        std::pair<GNode, EdgeIterator> result;
 //        for (auto node : graph) {

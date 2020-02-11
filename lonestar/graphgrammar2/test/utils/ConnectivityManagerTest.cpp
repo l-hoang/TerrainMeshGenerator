@@ -37,7 +37,7 @@ vector<GNode> generateSampleGraph2(Graph &graph) {
 //
 //    REQUIRE((graph.getEdgeData(edge).getSrc()) != &(nodes[1]));
 //}
-//
+
 //TEST_CASE( "findSrc negative Test" ) {
 //    galois::SharedMemSys G;
 //    Graph graph{};

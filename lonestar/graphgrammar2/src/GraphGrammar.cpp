@@ -30,6 +30,8 @@ int main(int argc, char **argv) {
     Config config = Config::parse_arguments(argc, argv);
 
     galois::SharedMemSys G;
+    galois::setActiveThreads(8);
+
     LonestarStart(argc, argv, name, desc, url);//---------
     Graph graph{};
 
@@ -62,7 +64,7 @@ int main(int argc, char **argv) {
     Production5 production5{connManager};
     Production6 production6{connManager};
     int i = 0;
-    afterStep(0, graph);
+//    afterStep(0, graph);
     for (int j = 0; j < config.steps; j++) {
         galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto &ctx) {
             if (!graph.containsNode(node, galois::MethodFlag::WRITE)) {
@@ -125,8 +127,8 @@ int main(int argc, char **argv) {
 }
 
 void afterStep(int i, Graph &graph) {
-    auto path = std::string("out/step") + std::to_string((i - 1)) + ".mgf";
-    MyGraphFormatWriter::writeToFile(graph, path);
-    system((std::string("./display.sh ") + path).c_str());
-    std::cout << std::endl;
+//    auto path = std::string("out/step") + std::to_string((i - 1)) + ".mgf";
+//    MyGraphFormatWriter::writeToFile(graph, path);
+//    system((std::string("./display.sh ") + path).c_str());
+//    std::cout << std::endl;
 }

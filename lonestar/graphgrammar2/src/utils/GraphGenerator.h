@@ -1,6 +1,7 @@
 #ifndef GALOIS_GRAPHGENERATOR_H
 #define GALOIS_GRAPHGENERATOR_H
 
+#include "Utils.h"
 
 class GraphGenerator {
 public:
@@ -27,23 +28,17 @@ public:
         vector<GNode> nodes;
         ConnectivityManager connManager{graph};
 
-        nodes.push_back(connManager.createNode(
-                NodeData{false, Coordinates{west_border, south_border, map.get_height(west_border, south_border)},
-                         false}));
-        nodes.push_back(connManager.createNode(
-                NodeData{false, Coordinates{west_border, north_border, map.get_height(west_border, north_border)},
-                         false}));
-        nodes.push_back(connManager.createNode(
-                NodeData{false, Coordinates{east_border, south_border, map.get_height(east_border, south_border)},
-                         false}));
-        nodes.push_back(connManager.createNode(
-                NodeData{false, Coordinates{east_border, north_border, map.get_height(east_border, north_border)},
-                         false}));
+        Utils::convertToUtm(south_border, west_border, map);
 
-//        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{west_border, south_border, 0}, false}));
-//        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{west_border, north_border, 0}, false}));
-//        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{east_border, south_border, 0}, false}));
-//        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{east_border, north_border, 0}, false}));
+        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{Utils::convertToUtm(south_border, west_border, map), map}, false}));
+        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{Utils::convertToUtm(north_border, west_border, map), map}, false}));
+        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{Utils::convertToUtm(south_border, east_border, map), map}, false}));
+        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{Utils::convertToUtm(north_border, east_border, map), map}, false}));
+
+//        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{west_border, south_border}, false}));
+//        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{west_border, north_border}, false}));
+//        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{east_border, south_border}, false}));
+//        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{east_border, north_border}, false}));
 
         double length1 = nodes[0]->getData().getCoords().dist(nodes[1]->getData().getCoords(), version2D);
         double length2 = nodes[1]->getData().getCoords().dist(nodes[3]->getData().getCoords(), version2D);

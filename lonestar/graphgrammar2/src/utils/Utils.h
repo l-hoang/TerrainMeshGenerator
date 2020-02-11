@@ -5,37 +5,13 @@
 
 #include <cstdint>
 #include <cstdlib>
+#include <utility>
+#include "../libmgrs/utm.h"
+#include "../model/Map.h"
 
 class Utils {
 public:
-
-    constexpr static const double EPSILON = 1e-8;
-
-    struct config {
-        double tolerance;
-        size_t requested_size;
-        char *output_filename;
-        char *input_filename;
-        bool read_from_ASC;
-        double west_border;
-        double north_border;
-        double east_border;
-        double south_border;
-        char *map_dir;
-        bool use_inp;
-        bool post_utm;
-        bool use_height;
-        bool pre_utm;
-        bool use_smesh;
-        bool use_floater;
-        int procs_x;
-        int procs_y;
-        int procs_z;
-        uint16_t point_per_proc_x;
-        uint16_t point_per_proc_y;
-        uint16_t point_per_proc_z;
-        int height;
-    };
+    constexpr static const double EPSILON = 1e-6;
 
     static bool is_lesser(double a, double b);
 
@@ -58,6 +34,8 @@ public:
     static double r2d(double radians);
 
     static void shift(int from, int to, size_t *array);
+
+    static std::pair<double, double> convertToUtm(double latitude, double longitude, Map &map);
 };
 
 

@@ -5,6 +5,7 @@
 #include "catch.hpp"
 #include "productions/Production1Test.cpp"
 #include "utils/ConnectivityManagerTest.cpp"
+#include "utils/UtilsTest.cpp"
 #include "model/ProductionStateTest.cpp"
 
 #endif //GALOIS_TESTMAIN_H

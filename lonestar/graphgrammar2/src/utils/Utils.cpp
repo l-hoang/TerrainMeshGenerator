@@ -68,10 +68,19 @@ double Utils::r2d(double radians) {
     return radians * 180 / PI;
 }
 
-
 void Utils::shift(int from, int to, size_t *array) {
     for (int i = to; i > from; --i) {
         array[i] = array[i - 1];
     }
 }
 
+std::pair<double, double> Utils::convertToUtm(double latitude, double longitude, Map &map) {
+    long zone;
+    char hemisphere;
+    double easting;
+    double northing;
+    Convert_Geodetic_To_UTM(latitude, longitude, &zone, &hemisphere, &easting, &northing);
+    map.setZone(zone);
+    map.setHemisphere(hemisphere);
+    return std::pair<double, double>(easting, northing);
+}
