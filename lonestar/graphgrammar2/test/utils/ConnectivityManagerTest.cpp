@@ -26,37 +26,37 @@ vector<GNode> generateSampleGraph2(Graph &graph) {
 }
 
 
-TEST_CASE( "getSrc positive Test" ) {
-    galois::SharedMemSys G;
-    Graph graph{};
-    vector<GNode> nodes = generateSampleGraph(graph);
-    ConnectivityManager connManager{graph};
-
-    auto edge = graph.findEdge(nodes[0], nodes[1]);
-    EdgeData edgeData = graph.getEdgeData(edge);
-
-    REQUIRE((graph.getEdgeData(edge).getSrc()) != &(nodes[1]));
-}
-
-TEST_CASE( "findSrc negative Test" ) {
-    galois::SharedMemSys G;
-    Graph graph{};
-    vector<GNode> nodes = generateSampleGraph(graph);
-    ConnectivityManager connManager{graph};
-
-    auto edge = graph.findEdge(nodes[1], nodes[2]);
-
-    REQUIRE(edge.base() == edge.end());
-}
-
-TEST_CASE( "findSrc positive Test" ) {
-    galois::SharedMemSys G;
-    Graph graph{};
-    vector<GNode> nodes = generateSampleGraph(graph);
-    ConnectivityManager connManager{graph};
-
-    auto edge = graph.findEdge(nodes[0], nodes[1]);
-
-    REQUIRE(edge.base() != edge.end());
-}
+//TEST_CASE( "getSrc positive Test" ) {
+//    galois::SharedMemSys G;
+//    Graph graph{};
+//    vector<GNode> nodes = generateSampleGraph(graph);
+//    ConnectivityManager connManager{graph};
+//
+//    auto edge = graph.findEdge(nodes[0], nodes[1]);
+//    EdgeData edgeData = graph.getEdgeData(edge);
+//
+//    REQUIRE((graph.getEdgeData(edge).getSrc()) != &(nodes[1]));
+//}
+//
+//TEST_CASE( "findSrc negative Test" ) {
+//    galois::SharedMemSys G;
+//    Graph graph{};
+//    vector<GNode> nodes = generateSampleGraph(graph);
+//    ConnectivityManager connManager{graph};
+//
+//    auto edge = graph.findEdge(nodes[1], nodes[2]);
+//
+//    REQUIRE(edge.base() == edge.end());
+//}
+//
+//TEST_CASE( "findSrc positive Test" ) {
+//    galois::SharedMemSys G;
+//    Graph graph{};
+//    vector<GNode> nodes = generateSampleGraph(graph);
+//    ConnectivityManager connManager{graph};
+//
+//    auto edge = graph.findEdge(nodes[0], nodes[1]);
+//
+//    REQUIRE(edge.base() != edge.end());
+//}
 

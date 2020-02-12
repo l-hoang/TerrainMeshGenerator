@@ -53,23 +53,23 @@ public:
         return counter;
     }
 
-    std::pair<GNode, EdgeIterator> findSrc(const EdgeIterator &edge) const {
-        std::pair<GNode, EdgeIterator> result(*(graph.getEdgeData(edge).getSrc()), edge);
-        return result;
-    }
+//    std::pair<GNode, EdgeIterator> findSrc(const EdgeIterator &edge) const {
+//        std::pair<GNode, EdgeIterator> result(*(graph.getEdgeData(edge).getSrc()), edge);
+//        return result;
+//    }
 
-    std::pair<GNode, EdgeIterator> findSrc(EdgeData edge) const { //Terribly slow version
-        std::pair<GNode, EdgeIterator> result;
-        for (auto node : graph) {
-            for (const auto &e : graph.edges(node)) {
-                if (graph.getEdgeData(e).getMiddlePoint() == edge.getMiddlePoint()) {
-                    result.first = node;
-                    result.second = e;
-                }
-            }
-        }
-        return result;
-    }
+//    std::pair<GNode, EdgeIterator> findSrc(EdgeData edge) const { //Terribly slow version
+//        std::pair<GNode, EdgeIterator> result;
+//        for (auto node : graph) {
+//            for (const auto &e : graph.edges(node)) {
+//                if (graph.getEdgeData(e).getMiddlePoint() == edge.getMiddlePoint()) {
+//                    result.first = node;
+//                    result.second = e;
+//                }
+//            }
+//        }
+//        return result;
+//    }
 
     optional<GNode> findNodeBetween(const GNode &node1, const GNode &node2) const { //TODO: Consider optimization
         Coordinates expectedLocation = (node1->getData().getCoords() + node2->getData().getCoords()) / 2.;
@@ -105,8 +105,6 @@ public:
         graph.getEdgeData(edge).setBorder(border);
         graph.getEdgeData(edge).setMiddlePoint(middlePoint);
         graph.getEdgeData(edge).setLength(length);
-        graph.getEdgeData(edge).setSrc(&node1);
-        graph.getEdgeData(edge).setSrc(&node2);
     }
 
     void createInterior(const GNode &node1, const GNode &node2, const GNode &node3,

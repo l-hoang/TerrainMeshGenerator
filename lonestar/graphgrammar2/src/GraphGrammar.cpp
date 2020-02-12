@@ -4,7 +4,7 @@
 #include "model/NodeData.h"
 #include "model/Graph.h"
 #include "model/Map.h"
-#include "productions/TerrainConditionChecker.h"
+#include "conditions/TerrainConditionChecker.h"
 #include "productions/Production1.h"
 #include "productions/Production2.h"
 #include "productions/Production3.h"
@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
     GraphGenerator::generateSampleGraphWithData(graph, *map, 19.5, 50.5, 19.7, 50.3, config.version2D);
 
     ConnectivityManager connManager{graph};
-    TerrainConditionChecker checker = TerrainConditionChecker(*map);
+    TerrainConditionChecker checker = TerrainConditionChecker(config.tolerance, connManager, *map);
     Production1 production1{connManager};
     Production2 production2{connManager};
     Production3 production3{connManager};
@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
             if (!node->getData().isHyperEdge()) {
                 return;
             }
-            if (checker.execute(node,100., connManager)) {
+            if (checker.execute(node)) {
 //                afterStep(i, graph);
                 return;
             }

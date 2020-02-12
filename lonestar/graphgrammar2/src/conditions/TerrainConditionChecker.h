@@ -8,12 +8,13 @@
 #include "../model/Map.h"
 #include "../model/ProductionState.h"
 #include "../libmgrs/utm.h"
+#include "ConditionChecker.h"
 
-class TerrainConditionChecker {
+class TerrainConditionChecker : public ConditionChecker {
 public:
-    explicit TerrainConditionChecker(Map &map) : map(map) {}
+    explicit TerrainConditionChecker(double tolerance, ConnectivityManager &connManager, Map &map) : tolerance(tolerance), connManager(connManager), map(map) {}
 
-    bool execute(GNode &node, double tolerance, ConnectivityManager connManager) {
+    bool execute(GNode &node) override {
 
         NodeData &nodeData = node->getData();
         if (!checkBasicApplicabilityCondition(nodeData)) {
@@ -22,7 +23,7 @@ public:
 
         vector<Coordinates> verticesCoords = connManager.getVerticesCoords(node);
 
-        if (!inside_condition(verticesCoords, tolerance)) {
+        if (!inside_condition(verticesCoords)) {
             return false;
         }
 
@@ -31,13 +32,15 @@ public:
     }
 
 private:
+    double tolerance;
+    ConnectivityManager &connManager;
     Map &map;
 
     bool checkBasicApplicabilityCondition(const NodeData &nodeData) const {
         return nodeData.isHyperEdge();
     }
 
-    bool inside_condition(const vector<Coordinates> &verticesCoords, double tolerance) {
+    bool inside_condition(const vector<Coordinates> &verticesCoords) {
         double lowest_x =
                 verticesCoords[0].getX() < verticesCoords[1].getX()
                 ? verticesCoords[0].getX() : verticesCoords[1].getX();
