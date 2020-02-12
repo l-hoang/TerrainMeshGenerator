@@ -23,6 +23,58 @@ public:
         connManager.createInterior(nodes[0], nodes[3], nodes[2]);
     }
 
+    static void generateSampleGraphWithDataWithConversionToUtm(Graph &graph, Map &map, const double west_border,
+                                                               const double north_border, const double east_border,
+                                                               const double south_border, bool version2D) {
+        vector<GNode> nodes;
+        ConnectivityManager connManager{graph};
+
+        Utils::convertToUtm(south_border, west_border, map);
+
+        nodes.push_back(connManager.createNode(
+                NodeData{false, Coordinates{Utils::convertToUtm(south_border, west_border, map), map}, false}));
+        nodes.push_back(connManager.createNode(
+                NodeData{false, Coordinates{Utils::convertToUtm(north_border, west_border, map), map}, false}));
+        nodes.push_back(connManager.createNode(
+                NodeData{false, Coordinates{Utils::convertToUtm(south_border, east_border, map), map}, false}));
+        nodes.push_back(connManager.createNode(
+                NodeData{false, Coordinates{Utils::convertToUtm(north_border, east_border, map), map}, false}));
+
+//        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{west_border, south_border}, false}));
+//        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{west_border, north_border}, false}));
+//        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{east_border, south_border}, false}));
+//        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{east_border, north_border}, false}));
+
+        double length1 = nodes[0]->getData().getCoords().dist(nodes[1]->getData().getCoords(), version2D);
+        double length2 = nodes[1]->getData().getCoords().dist(nodes[3]->getData().getCoords(), version2D);
+        double length3 = nodes[2]->getData().getCoords().dist(nodes[3]->getData().getCoords(), version2D);
+        double length4 = nodes[0]->getData().getCoords().dist(nodes[2]->getData().getCoords(), version2D);
+        double length5 = nodes[3]->getData().getCoords().dist(nodes[0]->getData().getCoords(), version2D);
+
+        connManager.createEdge(nodes[0], nodes[1], true, Coordinates{west_border, (north_border + south_border) / 2.,
+                                                                     map.get_height(west_border,
+                                                                                    (north_border + south_border) /
+                                                                                    2.)}, length1);
+        connManager.createEdge(nodes[1], nodes[3], true, Coordinates{(west_border + east_border) / 2., north_border,
+                                                                     map.get_height((west_border + east_border) / 2.,
+                                                                                    north_border)}, length2);
+        connManager.createEdge(nodes[2], nodes[3], true, Coordinates{east_border, (north_border + south_border) / 2.,
+                                                                     map.get_height(east_border,
+                                                                                    (north_border + south_border) /
+                                                                                    2.)}, length3);
+        connManager.createEdge(nodes[0], nodes[2], true, Coordinates{(west_border + east_border) / 2., south_border,
+                                                                     map.get_height((west_border + east_border) / 2.,
+                                                                                    south_border)}, length4);
+        connManager.createEdge(nodes[3], nodes[0], false,
+                               Coordinates{(west_border + east_border) / 2., (north_border + south_border) / 2.,
+                                           map.get_height((west_border + east_border) / 2.,
+                                                          (north_border + south_border) / 2.)}, length5);
+
+        connManager.createInterior(nodes[0], nodes[1], nodes[3]);
+        connManager.createInterior(nodes[0], nodes[3], nodes[2]);
+    }
+
+
     static void generateSampleGraphWithData(Graph &graph, Map &map, const double west_border, const double north_border,
                                             const double east_border, const double south_border, bool version2D) {
         vector<GNode> nodes;
@@ -30,10 +82,14 @@ public:
 
         Utils::convertToUtm(south_border, west_border, map);
 
-        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{Utils::convertToUtm(south_border, west_border, map), map}, false}));
-        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{Utils::convertToUtm(north_border, west_border, map), map}, false}));
-        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{Utils::convertToUtm(south_border, east_border, map), map}, false}));
-        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{Utils::convertToUtm(north_border, east_border, map), map}, false}));
+        nodes.push_back(connManager.createNode(
+                NodeData{false, Coordinates{south_border, west_border, map}, false}));
+        nodes.push_back(connManager.createNode(
+                NodeData{false, Coordinates{north_border, west_border, map}, false}));
+        nodes.push_back(connManager.createNode(
+                NodeData{false, Coordinates{south_border, east_border, map}, false}));
+        nodes.push_back(connManager.createNode(
+                NodeData{false, Coordinates{north_border, east_border, map}, false}));
 
 //        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{west_border, south_border}, false}));
 //        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{west_border, north_border}, false}));
