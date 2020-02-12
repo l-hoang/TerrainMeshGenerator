@@ -15,9 +15,8 @@ public:
     explicit TerrainConditionChecker(double tolerance, ConnectivityManager &connManager, Map &map) : tolerance(tolerance), connManager(connManager), map(map) {}
 
     bool execute(GNode &node) override {
-
         NodeData &nodeData = node->getData();
-        if (!checkBasicApplicabilityCondition(nodeData)) {
+        if (!nodeData.isHyperEdge()) {
             return false;
         }
 
@@ -35,10 +34,6 @@ private:
     double tolerance;
     ConnectivityManager &connManager;
     Map &map;
-
-    bool checkBasicApplicabilityCondition(const NodeData &nodeData) const {
-        return nodeData.isHyperEdge();
-    }
 
     bool inside_condition(const vector<Coordinates> &verticesCoords) {
         double lowest_x =

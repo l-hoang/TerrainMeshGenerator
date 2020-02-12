@@ -81,7 +81,10 @@ private:
         const std::pair<int, int> &edgeVertices = getEdgeVertices(edgeToBreak);
         connManager.removeEdge(pState.getVertices()[edgeVertices.first], pState.getVertices()[edgeVertices.second]);
 
-        NodeData newNodeData = NodeData{false, edgesData[edgeToBreak].get().getMiddlePoint(), !breakingOnBorder};
+        const Coordinates &newPointCoords = getNewPointCoords(pState.getVerticesData()[edgeVertices.first].getCoords(),
+                                                              pState.getVerticesData()[edgeVertices.second].getCoords(),
+                                                              pState.getZGetter());
+        NodeData newNodeData = NodeData{false, newPointCoords, !breakingOnBorder};
         GNode newNode = graph.createNode(newNodeData);
         graph.addNode(newNode);
         ctx.push(newNode);
@@ -131,6 +134,13 @@ private:
         graph.getEdgeData(newEdge).setBorder(border);
         graph.getEdgeData(newEdge).setLength(length);
         graph.getEdgeData(newEdge).setMiddlePoint(middlePoint);
+    }
+
+    Coordinates getNewPointCoords(const Coordinates &coords1, const Coordinates &coords2,
+                                  const std::function<double(double, double)> &zGetter) const {
+        double x = (coords1.getX() + coords2.getX()) / 2.;
+        double y = (coords1.getY() + coords2.getY()) / 2.;
+        return {x, y, zGetter(x, y)};
     }
 };
 

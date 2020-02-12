@@ -85,7 +85,8 @@ int main(int argc, char **argv) {
                 return;
             }
             ConnectivityManager connManager{graph};
-            ProductionState pState(connManager, node, config.version2D);
+            ProductionState pState(connManager, node, config.version2D,
+                                   [&map](double x, double y) -> double { return map->get_height(x, y); });
 //            std::cout << i++ << ": ";
             if (production1.execute(pState, ctx)) {
                 afterStep(i, graph);

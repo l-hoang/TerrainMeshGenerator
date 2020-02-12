@@ -17,12 +17,14 @@ private:
     vector<double> lengths;
     vector<int> brokenEdges;
     bool version2D;
+    std::function<double(double, double)> zGetter;
 
 public:
-    ProductionState(ConnectivityManager &connManager, GNode &interior,
-                    bool version2D) : interior(interior), interiorData(interior->getData()),
-                                      vertices(connManager.getNeighbours(interior)),
-                                      edgesIterators(connManager.getTriangleEdges(vertices)), version2D(version2D) {
+    ProductionState(ConnectivityManager &connManager, GNode &interior, bool version2D,
+                    std::function<double(double, double)> zGetter) : interior(interior), interiorData(interior->getData()),
+                                                             vertices(connManager.getNeighbours(interior)),
+                                                             edgesIterators(connManager.getTriangleEdges(vertices)),
+                                                             version2D(version2D), zGetter(zGetter) {
         Graph &graph = connManager.getGraph();
         for (int i = 0; i < 3; ++i) {
             auto maybeEdgeIter = edgesIterators[i];
@@ -97,6 +99,10 @@ public:
 
     bool isVersion2D() const {
         return version2D;
+    }
+
+    const std::function<double(double, double)> &getZGetter() const {
+        return zGetter;
     }
 };
 
