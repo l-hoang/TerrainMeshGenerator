@@ -6,8 +6,6 @@
 
 
 class EdgeData {
-    typedef galois::graphs::MorphGraph<NodeData, EdgeData, false> Graph;
-    typedef Graph::GraphNode GNode;
 private:
     bool border;
     double length;
@@ -16,9 +14,8 @@ private:
 public:
     EdgeData() : border(false), length(-1), middlePoint() {};
 
-    EdgeData(bool border, double length, Coordinates middlePoint, GNode *src, GNode *dst) : border(border),
-                                                                                            length(length),
-                                                                                            middlePoint(middlePoint) {}
+    EdgeData(bool border, double length, Coordinates middlePoint) : border(border), length(length),
+                                                                    middlePoint(middlePoint) {}
 
     bool isBorder() const {
         return border;

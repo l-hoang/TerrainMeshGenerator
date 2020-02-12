@@ -6,7 +6,7 @@
 #include <cstdio>
 #include <cstring>
 
-int readLine(FILE *f, char *buffer, const size_t buffersize, size_t *line_number) {
+int AsciiReader::readLine(FILE *f, char *buffer, const size_t buffersize, size_t *line_number) {
 
     do {
         if (fgets(buffer, buffersize, f) != NULL) {
@@ -30,12 +30,12 @@ int readLine(FILE *f, char *buffer, const size_t buffersize, size_t *line_number
     return 0;
 }
 
-Map *read_ASC(const char *filename) {
+Map *AsciiReader::read(const std::string filename) {
     const size_t tambuf = 256;
     char buf[tambuf];
     size_t line_number = 0;
 
-    FILE *fp = fopen(filename, "r");
+    FILE *fp = fopen(filename.c_str(), "r");
     if (fp == NULL) {
         fprintf(stderr, "Cannot open file %s\n", filename);
         exit(EXIT_FAILURE);
@@ -132,7 +132,7 @@ Map *read_ASC(const char *filename) {
     return map;
 }
 
-Map *convert(double** coords, size_t nRows, size_t nCols) { double ** map_data = Map::init_map_data(nRows, nCols);
+Map *AsciiReader::convert(double** coords, size_t nRows, size_t nCols) { double ** map_data = Map::init_map_data(nRows, nCols);
     for (size_t k = 0; k < nRows; ++k) {
         for (size_t i = 0; i < nCols; ++i) {
             map_data[k][i] = coords[k*nCols+i][2];

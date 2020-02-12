@@ -15,7 +15,8 @@
 #include "utils/MyGraphFormatWriter.h"
 #include "utils/utils.h"
 #include "utils/GraphGenerator.h"
-#include "Readers/SrtmReader.h"
+#include "readers/SrtmReader.h"
+#include "readers/AsciiReader.h"
 #include "utils/Config.h"
 
 
@@ -43,22 +44,25 @@ int main(int argc, char **argv) {
 
     galois::reportPageAlloc("MeminfoPre2");
 
-    SrtmReader reader;
-    Map * map = reader.read_SRTM(19.5, 50.5, 19.7, 50.3, "data");
+    AsciiReader reader;
+    Map *map = reader.read("data/test2.asc");
+//    Map * map = reader.read(19.5, 50.5, 19.7, 50.3, "data");
 //    GraphGenerator::generateSampleGraph(graph);
-    GraphGenerator::generateSampleGraphWithData(graph, *map, 19.5, 50.5, 19.7, 50.3, config.version2D);
+    GraphGenerator::generateSampleGraphWithData(graph, *map, 0, map->getLength() - 1, map->getWidth() - 1, 0,
+                                                config.version2D);
+//    GraphGenerator::generateSampleGraphWithData(graph, *map, 19.5, 50.5, 19.7, 50.3, config.version2D);
 
     ConnectivityManager connManager{graph};
-    DummyConditionChecker checker = DummyConditionChecker();
-//    TerrainConditionChecker checker = TerrainConditionChecker(config.tolerance, connManager, *map);
-    Production1 production1{connManager};
+//    DummyConditionChecker checker = DummyConditionChecker();
+    TerrainConditionChecker checker = TerrainConditionChecker(config.tolerance, connManager, *map);
+    Production1 production1{connManager}; //TODO: consider boost pointer containers
     Production2 production2{connManager};
     Production3 production3{connManager};
     Production4 production4{connManager};
     Production5 production5{connManager};
     Production6 production6{connManager};
     int i = 0;
-//    afterStep(0, graph);
+    afterStep(0, graph);
     for (int j = 0; j < config.steps; j++) {
         galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto &ctx) {
             if (!graph.containsNode(node, galois::MethodFlag::WRITE)) {
@@ -120,8 +124,8 @@ int main(int argc, char **argv) {
 }
 
 void afterStep(int i, Graph &graph) {
-//    auto path = std::string("out/step") + std::to_string((i - 1)) + ".mgf";
-//    MyGraphFormatWriter::writeToFile(graph, path);
-//    system((std::string("./display.sh ") + path).c_str());
-//    std::cout << std::endl;
+    auto path = std::string("out/step") + std::to_string((i - 1)) + ".mgf";
+    MyGraphFormatWriter::writeToFile(graph, path);
+    system((std::string("./display.sh ") + path).c_str());
+    std::cout << std::endl;
 }

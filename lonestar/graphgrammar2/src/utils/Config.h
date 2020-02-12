@@ -13,7 +13,7 @@ public:
     bool version2D;
     int steps;
 
-    Config() : tolerance(100), version2D(true), steps(5) {}
+    Config() : tolerance(4), version2D(false), steps(5) {}
 
     static Config parse_arguments(int argc, char **argv) {
         Config config{};

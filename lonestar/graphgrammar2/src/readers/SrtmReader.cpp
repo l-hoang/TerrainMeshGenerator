@@ -5,8 +5,8 @@
 #include "SrtmReader.h"
 #include "../utils/Utils.h"
 
-Map *SrtmReader::read_SRTM(const double west_border, const double north_border, const double east_border,
-                           const double south_border, const char *map_dir) { // data[row][column] - it's array of rows
+Map *SrtmReader::read(const double west_border, const double north_border, const double east_border,
+                      const double south_border, const char *map_dir) { // data[row][column] - it's array of rows
     Utils::swap_if_required((double *) &south_border, (double *) &north_border);
     Utils::swap_if_required((double *) &west_border, (double *) &east_border);
     // Rounding to avoid problems with numerical errors
