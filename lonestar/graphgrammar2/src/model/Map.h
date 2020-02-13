@@ -33,13 +33,15 @@ public:
                                                                                            length(length),
                                                                                            cell_width(cellWidth),
                                                                                            cell_length(cellLength),
-                                                                                           data(data), utm(false) {}
+                                                                                           data(data), utm(true) {}
 
     static double **init_map_data(size_t rows, size_t cols);
 
     void print_map();
 
     double get_height(double lon, double lat);
+
+    double get_height(double lon, double lat, bool convert);
 
     size_t getWidth() const {
         return width;

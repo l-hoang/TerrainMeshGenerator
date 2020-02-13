@@ -37,7 +37,7 @@ Map *AsciiReader::read(const std::string filename) {
 
     FILE *fp = fopen(filename.c_str(), "r");
     if (fp == NULL) {
-        fprintf(stderr, "Cannot open file %s\n", filename);
+        fprintf(stderr, "Cannot open file %s\n", filename.c_str());
         exit(EXIT_FAILURE);
     }
 
@@ -52,7 +52,7 @@ Map *AsciiReader::read(const std::string filename) {
                 fprintf(stderr,
                         "Header line has no space\n"
                         "%s:%zu\n",
-                        filename, line_number);
+                        filename.c_str(), line_number);
                 exit(EXIT_FAILURE);
             }
             char *p;
@@ -61,7 +61,7 @@ Map *AsciiReader::read(const std::string filename) {
                 fprintf(stderr,
                         "%s: not a decimal number\n"
                         "%s:%zu\n",
-                        buf, filename, line_number);
+                        buf, filename.c_str(), line_number);
                 exit(EXIT_FAILURE);
             }
 
@@ -69,7 +69,7 @@ Map *AsciiReader::read(const std::string filename) {
             fprintf(stderr,
                     "Problem reading ASC file\n"
                     "%s:%zu\n",
-                    filename, line_number);
+                    filename.c_str(), line_number);
             exit(EXIT_FAILURE);
         }
     }
@@ -96,7 +96,7 @@ Map *AsciiReader::read(const std::string filename) {
             fprintf(stderr,
                     "Problem reading ASC file\n"
                     "%s:%zu\n",
-                    filename, line_number);
+                    filename.c_str(), line_number);
             exit(EXIT_FAILURE);
         }
 
@@ -111,7 +111,7 @@ Map *AsciiReader::read(const std::string filename) {
                 fprintf(stderr,
                         "%s: not a decimal number\n"
                         "%s:%zu\n",
-                        buf_dummy, filename, line_number);
+                        buf_dummy, filename.c_str(), line_number);
                 exit(EXIT_FAILURE);
             } else {
                 buf_dummy = p + 1;

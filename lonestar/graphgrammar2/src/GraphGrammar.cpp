@@ -46,13 +46,13 @@ int main(int argc, char **argv) {
 
     galois::reportPageAlloc("MeminfoPre2");
 
-    AsciiReader reader;
-    Map *map = reader.read("data/test2.asc");
-//    Map * map = reader.read(19.5, 50.5, 19.7, 50.3, "data");
+//    AsciiReader reader;
+//    Map *map = reader.read("data/test2.asc");
+    SrtmReader reader;
+    Map * map = reader.read(19.5, 50.5, 19.7, 50.3, "data");
 //    GraphGenerator::generateSampleGraph(graph);
-    GraphGenerator::generateSampleGraphWithData(graph, *map, 0, map->getLength() - 1, map->getWidth() - 1, 0,
-                                                config.version2D);
-//    GraphGenerator::generateSampleGraphWithData(graph, *map, 19.5, 50.5, 19.7, 50.3, config.version2D);
+//    GraphGenerator::generateSampleGraphWithData(graph, *map, 0, map->getLength() - 1, map->getWidth() - 1, 0, config.version2D);
+    GraphGenerator::generateSampleGraphWithDataWithConversionToUtm(graph, *map, 19.5, 50.5, 19.7, 50.37, config.version2D);
 
     ConnectivityManager connManager{graph};
 //    DummyConditionChecker checker = DummyConditionChecker();
@@ -127,8 +127,8 @@ int main(int argc, char **argv) {
 }
 
 void afterStep(int i, Graph &graph) {
-    auto path = std::string("out/step") + std::to_string((i - 1)) + ".mgf";
-    MyGraphFormatWriter::writeToFile(graph, path);
-    system((std::string("./display.sh ") + path).c_str());
+//    auto path = std::string("out/step") + std::to_string((i - 1)) + ".mgf";
+//    MyGraphFormatWriter::writeToFile(graph, path);
+//    system((std::string("./display.sh ") + path).c_str());
 //    std::cout << std::endl;
 }

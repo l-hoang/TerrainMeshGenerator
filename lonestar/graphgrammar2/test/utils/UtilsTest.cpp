@@ -13,8 +13,8 @@ TEST_CASE( "convertToUtm Test" ) {
 
     const std::pair<double, double> &pair = Utils::convertToUtm(latitude, longitude, map);
     
-    REQUIRE(pair.first == easting);
-    REQUIRE(pair.second == northing);
+    REQUIRE(fabs(pair.first - easting) < 1e-1);
+    REQUIRE(fabs(pair.second - northing) < 1e-1);
     REQUIRE(map.getZone() == zone);
     REQUIRE(map.getHemisphere() == hemisphere);
 }

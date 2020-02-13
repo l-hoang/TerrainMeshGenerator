@@ -24,11 +24,15 @@ void Map::print_map() {
 }
 
 double Map::get_height(double lon, double lat) {
+    get_height(lon, lat, utm);
+}
+
+double Map::get_height(double lon, double lat, bool convert) {
     double x, y;
     //convert to geodetic if required
-    if (utm) {
+    if (convert) {
         if (Convert_UTM_To_Geodetic(zone, hemisphere, lon, lat, &y, &x)) {
-            fprintf(stderr, "Error during conversion.\n");
+            fprintf(stderr, "Error during conversion to geodetic.\n");
             exit(18);
         }
         x = Utils::r2d(x);

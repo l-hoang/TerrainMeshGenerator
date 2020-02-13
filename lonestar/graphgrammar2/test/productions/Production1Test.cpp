@@ -15,7 +15,7 @@ TEST_CASE( "Production1 Test" ) {
     galois::UserContext<GNode> ctx;
     ConnectivityManager connManager{graph};
     Production1 production{connManager};
-    ProductionState pState(connManager, nodes[5], false);
+    ProductionState pState(connManager, nodes[5], false, [](double x, double y){ return 0.;});
     production.execute(pState, ctx);
 
     REQUIRE(countHEdges(graph) == 3);

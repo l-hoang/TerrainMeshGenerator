@@ -31,14 +31,18 @@ public:
 
         Utils::convertToUtm(south_border, west_border, map);
 
+        const Coordinates &coordinates0 = Coordinates{Utils::convertToUtm(south_border, west_border, map), map};
+        const Coordinates &coordinates1 = Coordinates{Utils::convertToUtm(north_border, west_border, map), map};
+        const Coordinates &coordinates2 = Coordinates{Utils::convertToUtm(south_border, east_border, map), map};
+        const Coordinates &coordinates3 = Coordinates{Utils::convertToUtm(north_border, east_border, map), map};
         nodes.push_back(connManager.createNode(
-                NodeData{false, Coordinates{Utils::convertToUtm(south_border, west_border, map), map}, false}));
+                NodeData{false, coordinates0, false}));
         nodes.push_back(connManager.createNode(
-                NodeData{false, Coordinates{Utils::convertToUtm(north_border, west_border, map), map}, false}));
+                NodeData{false, coordinates1, false}));
         nodes.push_back(connManager.createNode(
-                NodeData{false, Coordinates{Utils::convertToUtm(south_border, east_border, map), map}, false}));
+                NodeData{false, coordinates2, false}));
         nodes.push_back(connManager.createNode(
-                NodeData{false, Coordinates{Utils::convertToUtm(north_border, east_border, map), map}, false}));
+                NodeData{false, coordinates3, false}));
 
 //        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{west_border, south_border}, false}));
 //        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{west_border, north_border}, false}));
@@ -54,21 +58,21 @@ public:
         connManager.createEdge(nodes[0], nodes[1], true, Coordinates{west_border, (north_border + south_border) / 2.,
                                                                      map.get_height(west_border,
                                                                                     (north_border + south_border) /
-                                                                                    2.)}, length1);
+                                                                                    2., false)}, length1);
         connManager.createEdge(nodes[1], nodes[3], true, Coordinates{(west_border + east_border) / 2., north_border,
                                                                      map.get_height((west_border + east_border) / 2.,
-                                                                                    north_border)}, length2);
+                                                                                    north_border, false)}, length2);
         connManager.createEdge(nodes[2], nodes[3], true, Coordinates{east_border, (north_border + south_border) / 2.,
                                                                      map.get_height(east_border,
                                                                                     (north_border + south_border) /
-                                                                                    2.)}, length3);
+                                                                                    2., false)}, length3);
         connManager.createEdge(nodes[0], nodes[2], true, Coordinates{(west_border + east_border) / 2., south_border,
                                                                      map.get_height((west_border + east_border) / 2.,
-                                                                                    south_border)}, length4);
+                                                                                    south_border, false)}, length4);
         connManager.createEdge(nodes[3], nodes[0], false,
                                Coordinates{(west_border + east_border) / 2., (north_border + south_border) / 2.,
                                            map.get_height((west_border + east_border) / 2.,
-                                                          (north_border + south_border) / 2.)}, length5);
+                                                          (north_border + south_border) / 2., false)}, length5);
 
         connManager.createInterior(nodes[0], nodes[1], nodes[3]);
         connManager.createInterior(nodes[0], nodes[3], nodes[2]);

@@ -1,4 +1,5 @@
 #include <cmath>
+#include <cstdio>
 #include "Utils.h"
 
 
@@ -79,7 +80,10 @@ std::pair<double, double> Utils::convertToUtm(double latitude, double longitude,
     char hemisphere;
     double easting;
     double northing;
-    Convert_Geodetic_To_UTM(latitude, longitude, &zone, &hemisphere, &easting, &northing);
+    if (Convert_Geodetic_To_UTM(d2r(latitude), d2r(longitude), &zone, &hemisphere, &easting, &northing)) {
+        fprintf(stderr, "Error during conversion to UTM.\n");
+        exit(13);
+    }
     map.setZone(zone);
     map.setHemisphere(hemisphere);
     return std::pair<double, double>(easting, northing);
