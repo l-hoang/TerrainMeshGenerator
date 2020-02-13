@@ -29,10 +29,12 @@ void afterStep(int i, Graph &graph);
 bool basicCondition(const Graph &graph, GNode &node);
 
 int main(int argc, char **argv) {
-    Config config = Config::parse_arguments(argc, argv);
+    Config config = Config{argc, argv};
 
     galois::SharedMemSys G;
-    galois::setActiveThreads(8);
+    if (config.cores > 0) {
+        galois::setActiveThreads(config.cores);
+    }
 
     LonestarStart(argc, argv, name, desc, url);//---------
     Graph graph{};
@@ -51,10 +53,10 @@ int main(int argc, char **argv) {
 //    AsciiReader reader;
 //    Map *map = reader.read("data/test2.asc");
     SrtmReader reader;
-    Map *map = reader.read(19.7, 50.2, 20.3, 49.9, "data");
+    Map *map = reader.read(config.W, config.N, config.E, config.S, config.dataDir.c_str());
 //    GraphGenerator::generateSampleGraph(graph);
 //    GraphGenerator::generateSampleGraphWithData(graph, *map, 0, map->getLength() - 1, map->getWidth() - 1, 0, config.version2D);
-    GraphGenerator::generateSampleGraphWithDataWithConversionToUtm(graph, *map, 19.7, 50.2, 20.3, 49.9,
+    GraphGenerator::generateSampleGraphWithDataWithConversionToUtm(graph, *map, config.W, config.N, config.E, config.S,
                                                                    config.version2D);
 
     ConnectivityManager connManager{graph};
@@ -93,8 +95,10 @@ int main(int argc, char **argv) {
         });
     }
 
-    MyGraphFormatWriter::writeToFile(graph, "out/graph.mgf");
-    system("./display.sh out/graph.mgf");
+    MyGraphFormatWriter::writeToFile(graph, config.output);
+    if (config.display) {
+        system((std::string("./display.sh ") + config.output).c_str());
+    }
 
     delete map;
     return 0;
