@@ -5,7 +5,7 @@
 #include "../utils/ConnectivityManager.h"
 #include "../utils/utils.h"
 
-class Production1 : Production {
+class Production1 : public Production {
 private:
 
     bool checkApplicabilityCondition(const NodeData &nodeData,

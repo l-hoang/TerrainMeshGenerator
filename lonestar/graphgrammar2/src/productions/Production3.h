@@ -5,7 +5,7 @@
 #include "../utils/ConnectivityManager.h"
 #include "../utils/utils.h"
 
-class Production3 : Production {
+class Production3 : public Production {
 private:
 
     bool checkApplicabilityCondition(const std::vector<optional<EdgeIterator>> &edgesIterators) const {

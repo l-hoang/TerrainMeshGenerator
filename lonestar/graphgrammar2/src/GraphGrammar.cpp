@@ -26,6 +26,8 @@ static const char *url = "mesh_generator";
 
 void afterStep(int i, Graph &graph);
 
+bool basicCondition(const Graph &graph, GNode &node);
+
 int main(int argc, char **argv) {
     Config config = Config::parse_arguments(argc, argv);
 
@@ -49,74 +51,46 @@ int main(int argc, char **argv) {
 //    AsciiReader reader;
 //    Map *map = reader.read("data/test2.asc");
     SrtmReader reader;
-    Map * map = reader.read(19.5, 50.5, 19.7, 50.3, "data");
+    Map *map = reader.read(19.5, 50.5, 19.7, 50.3, "data");
 //    GraphGenerator::generateSampleGraph(graph);
 //    GraphGenerator::generateSampleGraphWithData(graph, *map, 0, map->getLength() - 1, map->getWidth() - 1, 0, config.version2D);
-    GraphGenerator::generateSampleGraphWithDataWithConversionToUtm(graph, *map, 19.5, 50.5, 19.7, 50.37, config.version2D);
+    GraphGenerator::generateSampleGraphWithDataWithConversionToUtm(graph, *map, 19.7, 50.2, 20.3, 49.9,
+                                                                   config.version2D);
 
     ConnectivityManager connManager{graph};
 //    DummyConditionChecker checker = DummyConditionChecker();
     TerrainConditionChecker checker = TerrainConditionChecker(config.tolerance, connManager, *map);
-    Production1 production1{connManager}; //TODO: consider boost pointer containers
+    Production1 production1{
+            connManager}; //TODO: consider boost pointer containers, as they are believed to be better optimized
     Production2 production2{connManager};
     Production3 production3{connManager};
     Production4 production4{connManager};
     Production5 production5{connManager};
     Production6 production6{connManager};
+    vector<Production *> productions = {&production1, &production2, &production3, &production4, &production5,
+                                        &production6};
     int i = 0;
 //    afterStep(0, graph);
     for (int j = 0; j < config.steps; j++) {
         galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto &ctx) {
-            if (!graph.containsNode(node, galois::MethodFlag::WRITE)) {
-                return;
+            if (basicCondition(graph, node)) {
+                checker.execute(node);
             }
-            if (!node->getData().isHyperEdge()) {
-                return;
-            }
-            if (checker.execute(node)) {
-//                afterStep(i, graph);
-                return;
-            }
-
         });
         galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto &ctx) {
-            if (!graph.containsNode(node, galois::MethodFlag::WRITE)) {
-                return;
-            }
-            if (!node->getData().isHyperEdge()) {
+            if (!basicCondition(graph, node)) {
                 return;
             }
             ConnectivityManager connManager{graph};
             ProductionState pState(connManager, node, config.version2D,
                                    [&map](double x, double y) -> double { return map->get_height(x, y); });
-//            std::cout << i++ << ": ";
-            if (production1.execute(pState, ctx)) {
-                afterStep(i, graph);
-                return;
+            for (Production *production : productions) {
+                if (production->execute(pState, ctx)) {
+                    afterStep(i, graph);
+                    return;
+                }
             }
-            if (production2.execute(pState, ctx)) {
-                afterStep(i, graph);
-                return;
-            }
-            if (production3.execute(pState, ctx)) {
-                afterStep(i, graph);
-                return;
-            }
-            if (production4.execute(pState, ctx)) {
-                afterStep(i, graph);
-                return;
-            }
-            if (production5.execute(pState, ctx)) {
-                afterStep(i, graph);
-                return;
-            }
-            if (production6.execute(pState, ctx)) {
-                afterStep(i, graph);
-                return;
-            }
-
         });
-
     }
 
     MyGraphFormatWriter::writeToFile(graph, "out/graph.mgf");
@@ -124,6 +98,10 @@ int main(int argc, char **argv) {
 
     delete map;
     return 0;
+}
+
+bool basicCondition(const Graph &graph, GNode &node) {
+    return graph.containsNode(node, galois::MethodFlag::WRITE) && node->getData().isHyperEdge();
 }
 
 void afterStep(int i, Graph &graph) {

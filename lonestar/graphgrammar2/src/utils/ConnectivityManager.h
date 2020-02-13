@@ -27,11 +27,10 @@ public:
 
     optional<EdgeIterator> getEdge(const GNode &v1, const GNode &v2) const {
         EdgeIterator edge = graph.findEdge(v1, v2);
-        galois::optional<EdgeIterator> maybeEdge = getOptionalEdge(edge);
-        return maybeEdge;
+        return convertToOptionalEdge(edge);
     }
 
-    optional<EdgeIterator> getOptionalEdge(const EdgeIterator &edge) const {
+    optional<EdgeIterator> convertToOptionalEdge(const EdgeIterator &edge) const {
         if (edge.base() == edge.end()) {
             return galois::optional<EdgeIterator>();
         } else {
@@ -53,20 +52,7 @@ public:
         return counter;
     }
 
-//    std::pair<GNode, EdgeIterator> findSrc(EdgeData edge) const { //Terribly slow version
-//        std::pair<GNode, EdgeIterator> result;
-//        for (auto node : graph) {
-//            for (const auto &e : graph.edges(node)) {
-//                if (graph.getEdgeData(e).getMiddlePoint() == edge.getMiddlePoint()) {
-//                    result.first = node;
-//                    result.second = e;
-//                }
-//            }
-//        }
-//        return result;
-//    }
-
-    optional<GNode> findNodeBetween(const GNode &node1, const GNode &node2) const { //TODO: Consider optimization
+    optional<GNode> findNodeBetween(const GNode &node1, const GNode &node2) const {
         Coordinates expectedLocation = (node1->getData().getCoords() + node2->getData().getCoords()) / 2.;
         std::vector<GNode> neighbours1 = getNeighbours(node1);
         std::vector<GNode> neighbours2 = getNeighbours(node2);
@@ -149,9 +135,9 @@ public:
             graph.removeEdge(node2, edge2);
             return;
         }
-        std::cerr << "Problem in removing an edge.\n";
+        std::cerr << "Problem in removing an edge." << std::endl;
     }
-    
+
 private:
     Graph &graph;
 };
