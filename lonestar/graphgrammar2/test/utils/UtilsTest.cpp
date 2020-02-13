@@ -9,7 +9,9 @@ TEST_CASE( "convertToUtm Test" ) {
     double northing = 5539109.82;
     double easting = 428333.55;
     double **placeholder = (double **)malloc(sizeof(double*));
-    Map map{placeholder, 2, 2, 1., 1.};
+    placeholder[0] = (double *)malloc(sizeof(double));
+    placeholder[0][0] = 8;
+    Map map{placeholder, 1, 1, 1., 1.};
 
     const std::pair<double, double> &pair = Utils::convertToUtm(latitude, longitude, map);
     

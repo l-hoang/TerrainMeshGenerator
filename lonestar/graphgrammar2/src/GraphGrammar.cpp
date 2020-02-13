@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
 //    AsciiReader reader;
 //    Map *map = reader.read("data/test2.asc");
     SrtmReader reader;
-    Map *map = reader.read(19.5, 50.5, 19.7, 50.3, "data");
+    Map *map = reader.read(19.7, 50.2, 20.3, 49.9, "data");
 //    GraphGenerator::generateSampleGraph(graph);
 //    GraphGenerator::generateSampleGraphWithData(graph, *map, 0, map->getLength() - 1, map->getWidth() - 1, 0, config.version2D);
     GraphGenerator::generateSampleGraphWithDataWithConversionToUtm(graph, *map, 19.7, 50.2, 20.3, 49.9,
