@@ -24,8 +24,8 @@ public:
     string output;
 
     Config(int argc, char **argv) : tolerance(5), version2D(false), steps(15), cores(56), display(false), N(50.2), S(49.9),
-                                    E(20.3), W(19.7), dataDir("data"), ascii(false), asciiFile(""),
-                                    output("out/graph.mgf") {
+                                    E(20.2), W(19.7), dataDir("data"), ascii(false), asciiFile(""),
+                                    output("graph.mgf") {
         parseArguments(argc, argv);
     }
 
@@ -37,10 +37,10 @@ public:
 private:
 
     inline static const std::string USAGE = "OPTIONS:\n"
-                                            "\t-t <tolerance>\n"
-                                            "\t-s <steps>\n"
-                                            "\t-2 turns on 2D version\n"
-                                            "\t-3 turns on 3D version\n"
+//                                            "\t-t <tolerance>\n"
+//                                            "\t-s <steps>\n"
+//                                            "\t-2 turns on 2D version\n"
+//                                            "\t-3 turns on 3D version\n"
                                             "\n";
 
     void parseArguments(int argc, char **argv) {
@@ -48,9 +48,9 @@ private:
         if (argc == 1) {
             fprintf(stderr, "%s", USAGE.c_str());
         }
-        while ((argument = getopt(argc, argv, "t:23s:dN:S:E:W:D:af:o:c:")) != -1)
+        while ((argument = getopt(argc, argv, "T:23s:dN:S:E:W:D:af:o:c:")) != -1)
             switch (argument) {
-                case 't':
+                case 'T':
                     tolerance = strtod(optarg, nullptr);
                     break;
                 case '2':
@@ -93,7 +93,7 @@ private:
                     cores = strtoimax(optarg, nullptr, 10);
                     break;
                 case '?':
-                    if (optopt == 't' || optopt == 's' || optopt == '2' || optopt == '3' || optopt == 'd' ||
+                    if (optopt == 'T' || optopt == 's' || optopt == '2' || optopt == '3' || optopt == 'd' ||
                         optopt == 'N' || optopt == 'S' || optopt == 'E' || optopt == 'W' || optopt == 'D' ||
                         optopt == 'a' || optopt == 'f' || optopt == 'o' || optopt == 'c') {
 
@@ -106,9 +106,9 @@ private:
                         fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
                         fprintf(stderr, "%s", USAGE.c_str());
                     }
-                    exit(1);
+//                    exit(1);
                 default:
-                    abort();
+                    break;
             }
     }
 };
