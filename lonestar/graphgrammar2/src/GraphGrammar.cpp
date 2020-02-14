@@ -79,6 +79,8 @@ int main(int argc, char **argv) {
                 checker.execute(node);
             }
         });
+        galois::StatTimer step(("step" + std::to_string(j)).c_str());
+        step.start();
         galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto &ctx) {
             if (!basicCondition(graph, node)) {
                 return;
@@ -88,11 +90,12 @@ int main(int argc, char **argv) {
                                    [&map](double x, double y) -> double { return map->get_height(x, y); });
             for (Production *production : productions) {
                 if (production->execute(pState, ctx)) {
-                    afterStep(i, graph);
+                    afterStep(j, graph);
                     return;
                 }
             }
-        });
+        }, galois::loopname(("step" + std::to_string(j)).c_str()));
+        step.stop();
     }
 
     MyGraphFormatWriter::writeToFile(graph, config.output);
@@ -109,8 +112,8 @@ bool basicCondition(const Graph &graph, GNode &node) {
 }
 
 void afterStep(int i, Graph &graph) {
-//    auto path = std::string("out/step") + std::to_string((i - 1)) + ".mgf";
-//    MyGraphFormatWriter::writeToFile(graph, path);
+    auto path = std::string("out/step") + std::to_string((i - 1)) + ".mgf";
+    MyGraphFormatWriter::writeToFile(graph, path);
 //    system((std::string("./display.sh ") + path).c_str());
 //    std::cout << std::endl;
 }
