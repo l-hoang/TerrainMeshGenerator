@@ -23,7 +23,7 @@ public:
     string asciiFile;
     string output;
 
-    Config(int argc, char **argv) : tolerance(5), version2D(false), steps(11), cores(-1), display(true), N(50.2), S(49.9),
+    Config(int argc, char **argv) : tolerance(5), version2D(false), steps(15), cores(56), display(false), N(50.2), S(49.9),
                                     E(20.3), W(19.7), dataDir("data"), ascii(false), asciiFile(""),
                                     output("out/graph.mgf") {
         parseArguments(argc, argv);
@@ -115,3 +115,18 @@ private:
 
 
 #endif //GALOIS_CONFIG_H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
