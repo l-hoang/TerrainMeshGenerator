@@ -142,11 +142,6 @@ if(CMAKE_COMPILER_IS_GNUCC)
   if(GCC_VERSION VERSION_LESS 5.2)
     message(FATAL_ERROR "GCC must be 5.2 or higher")
   endif()
-  #new debugging optimization level
-  # if(CMAKE_BUILD_TYPE MATCHES "Debug")
-    # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Og")
-    # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Og")
-  # endif()
 endif()
 
 # Enable architecture-specific optimizations
@@ -190,8 +185,8 @@ endif()
 if(ENABLE_DIST_GALOIS)
   add_definitions(-DGALOIS_USE_DIST)
   find_package(MPI REQUIRED) # required even if USE_LCI
-  set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
-  set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
+  set(CMAKE_CXX_COMPILE_FLAGS "${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS}")
+  set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS}")
   include_directories(${MPI_INCLUDE_PATH})
 
   if (USE_LCI)
@@ -314,14 +309,6 @@ find_package(Threads REQUIRED)
 
 include(CheckMmap)
 
-include(CheckSchedSetAffinity)
-if(SCHED_SETAFFINITY_FOUND)
-  add_definitions(-DGALOIS_USE_SCHED_SETAFFINITY)
-elseif(USE_STRICT_CONFIG)
-  message(FATAL_ERROR "Need sched_setaffinity")
-endif()
-
-
 # HugePages
 include(CheckHugePages)
 if(NOT HAVE_HUGEPAGES AND USE_STRICT_CONFIG)
@@ -335,7 +322,6 @@ endif()
 
 # Boost
 set(Boost_ADDITIONAL_VERSIONS "1.58.0" "1.60.0" "1.61.0" "1.62.0")
-set(Boost_USE_MULTITHREADED OFF)
 if(NOT "$ENV{BOOST_DIR}" STREQUAL "")
   set(BOOST_ROOT $ENV{BOOST_DIR})
 endif()
@@ -418,9 +404,6 @@ function(linkApp name extlibs)
   target_link_libraries(${name} lonestar)
   target_link_libraries(${name} galois_shmem)
   target_link_libraries(${name} gllvm)
-  if (SCHED_SETAFFINITY_FOUND)
-    target_link_libraries(${name} ${SCHED_SETAFFINITY_LIBRARIES})
-  endif()
   target_link_libraries(${name} ${CMAKE_THREAD_LIBS_INIT})
 
   if(VTune_FOUND)
