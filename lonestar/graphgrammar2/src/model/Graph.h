@@ -10,4 +10,4 @@ typedef Graph::GraphNode GNode;
 typedef Graph::edge_iterator EdgeIterator;
 using galois::optional;
 
-#endif //GALOIS_GRAPH_H
+#endif // GALOIS_GRAPH_H
