@@ -25,7 +25,7 @@ void Map::print_map() {
 
 double Map::get_height(double lon, double lat) {
     fprintf(stderr, "DUPA 4\n");
-    get_height(lon, lat, utm);
+    return get_height(lon, lat, utm);
     fprintf(stderr, "DUPA 5\n");
 }
 
