@@ -2,6 +2,7 @@
 #include <cerrno>
 #include <cstring>
 #include <cmath>
+#include <galois/gIO.h>
 #include "SrtmReader.h"
 #include "../utils/Utils.h"
 
@@ -108,7 +109,7 @@ void SrtmReader::skip_outliers(double *const *map_data, size_t length, size_t wi
     for (int i = 0; i < length; ++i) {
         for (int j = 0; j < width; ++j) {
             if (map_data[i][j] > 3000 || map_data[i][j] < 10) {
-                printf("WARNING: Outliers detected. Skipping...\n");
+                galois::gInfo("Outlier in input data detected.");
                 if (i > 0) {
                     map_data[i][j] = map_data[i - 1][j];
                 } else {
