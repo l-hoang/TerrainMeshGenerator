@@ -23,9 +23,9 @@ public:
     string asciiFile;
     string output;
 
-    Config(int argc, char **argv) : tolerance(5), version2D(false), steps(8), cores(-1), display(false), N(50.2), S(49.3),
+    Config(int argc, char **argv) : tolerance(5), version2D(false), steps(14), cores(-1), display(false), N(50.2), S(49.3),
                                     E(20.7), W(19.2), dataDir("data"), ascii(false), asciiFile(""),
-                                    output("graph.mgf") {
+                                    output(string("graph") + std::to_string(galois::getActiveThreads()) + ".mgf") {
         parseArguments(argc, argv);
     }
 
