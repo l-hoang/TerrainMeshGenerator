@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
     galois::gInfo("All steps finished.");
 
     MyGraphFormatWriter::writeToFile(graph, config.output);
-    galois::gInfo("Graph written to file ", config.output);
+    galois::gInfo("Graph written to file ", config.output + std::to_string(config.tolerance));
     if (config.display) {
         system((std::string("./display.sh ") + config.output).c_str());
     }

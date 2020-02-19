@@ -26,26 +26,15 @@ public:
     static void generateSampleGraphWithDataWithConversionToUtm(Graph &graph, Map &map, const double west_border,
                                                                const double north_border, const double east_border,
                                                                const double south_border, bool version2D) {
-        galois::gInfo("Graph generation...");
         vector<GNode> nodes;
         ConnectivityManager connManager{graph};
-        galois::gInfo("ConnectivityManager created.");
 
-        Utils::convertToUtm(south_border, west_border, map);
+        Utils::convertToUtm(south_border, west_border, map); //TODO: What is a point of this call?!
 
-        galois::gInfo("Nodes coordinates preparation...");
-        const std::pair<double, double> &utm = Utils::convertToUtm(south_border, west_border, map);
-        fprintf(stderr, "DUPA 9\n");
-        const Coordinates &coordinatesDEBUG = Coordinates{0, 0, 0};
-        fprintf(stderr, "DUPA 8\n");
-        double d = map.get_height(utm.first, utm.second);
-        fprintf(stderr, "DUPA 10\n");
-        const Coordinates &coordinates0 = Coordinates{utm.first, utm.second, d};
-        galois::gInfo("Node0 coordinates prepared.");
+        const Coordinates &coordinates0 = Coordinates{Utils::convertToUtm(south_border, west_border, map), map};
         const Coordinates &coordinates1 = Coordinates{Utils::convertToUtm(north_border, west_border, map), map};
         const Coordinates &coordinates2 = Coordinates{Utils::convertToUtm(south_border, east_border, map), map};
         const Coordinates &coordinates3 = Coordinates{Utils::convertToUtm(north_border, east_border, map), map};
-        galois::gInfo("Nodes coordinates prepared.");
 
         nodes.push_back(connManager.createNode(
                 NodeData{false, coordinates0, false}));
@@ -55,7 +44,6 @@ public:
                 NodeData{false, coordinates2, false}));
         nodes.push_back(connManager.createNode(
                 NodeData{false, coordinates3, false}));
-        galois::gInfo("Nodes created.");
 
 //        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{west_border, south_border}, false}));
 //        nodes.push_back(connManager.createNode(NodeData{false, Coordinates{west_border, north_border}, false}));
@@ -86,11 +74,9 @@ public:
                                Coordinates{(west_border + east_border) / 2., (north_border + south_border) / 2.,
                                            map.get_height((west_border + east_border) / 2.,
                                                           (north_border + south_border) / 2., false)}, length5);
-        galois::gInfo("Edges created.");
 
         connManager.createInterior(nodes[0], nodes[1], nodes[3]);
         connManager.createInterior(nodes[0], nodes[3], nodes[2]);
-        galois::gInfo("Interiors created.");
     }
 
 

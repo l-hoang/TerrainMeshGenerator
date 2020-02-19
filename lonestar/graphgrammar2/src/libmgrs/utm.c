@@ -201,7 +201,6 @@ long Convert_Geodetic_To_UTM (double Latitude,
   double False_Easting = 500000;
   double False_Northing = 0;
   double Scale = 0.9996;
-    fprintf(stderr, "DUPA 1\n");
 
     if ((Latitude < MIN_LAT) || (Latitude > MAX_LAT))
   { /* Latitude out of range */
@@ -308,7 +307,6 @@ long Convert_Geodetic_To_UTM (double Latitude,
         }
     }
   } /* END OF if (!Error_Code) */
-    fprintf(stderr, "DUPA 2\n");
     return (Error_Code);
 } /* END OF Convert_Geodetic_To_UTM */
 
