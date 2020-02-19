@@ -15,12 +15,18 @@ public:
 
     Coordinates(double x, double y) : x(x), y(y), z(0.) {}
 
-    Coordinates(double x, double y, double z) : x(x), y(y), z(z) {}
+    Coordinates(double x, double y, double z) : x(x), y(y), z(z) {
+        fprintf(stderr, "DUPA 6/3\n");
+    }
 
-    Coordinates(double x, double y, Map &map) : x(x), y(y), z(map.get_height(x, y)) {}
+    Coordinates(double x, double y, Map &map) : x(x), y(y), z(map.get_height(x, y)) {
+        fprintf(stderr, "DUPA 6/2\n");
+    }
 
     Coordinates(std::pair<double, double> coords, Map &map) : x(coords.first), y(coords.second),
-                                                              z(map.get_height(coords.first, coords.second)) {}
+                                                              z(map.get_height(coords.first, coords.second)) {
+        fprintf(stderr, "DUPA 6\n");
+    }
 
     double getX() const {
         return x;

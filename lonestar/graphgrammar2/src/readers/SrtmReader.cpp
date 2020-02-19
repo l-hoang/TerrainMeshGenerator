@@ -106,25 +106,21 @@ void SrtmReader::read_from_file(int north_border_int, int west_border_int, size_
 }
 
 void SrtmReader::skip_outliers(double *const *map_data, size_t length, size_t width) {
+    bool outlierFound = false;
     for (int i = 0; i < length; ++i) {
         for (int j = 0; j < width; ++j) {
             if (map_data[i][j] > 3000 || map_data[i][j] < 10) {
-                galois::gInfo("Outlier in input data detected.");
+                outlierFound = true;
                 if (i > 0) {
                     map_data[i][j] = map_data[i - 1][j];
                 } else {
                     map_data[i][j] = map_data[i + 1][j];
                 }
             }
-//            if (map_data[i][j] > 3000 || map_data[i][j] < 10) {
-//                printf("WARNING: Outliers detected. Skipping...\n");
-//                if (j > 0) {
-//                    map_data[i][j] = map_data[i][j-1];
-//                } else {
-//                    map_data[i][j] = map_data[i][j+1];
-//                }
-//            }
         }
+    }
+    if (outlierFound) {
+        galois::gInfo("Outliers in input data detected.");
     }
 }
 

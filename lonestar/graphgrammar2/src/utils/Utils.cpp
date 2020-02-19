@@ -80,11 +80,13 @@ std::pair<double, double> Utils::convertToUtm(double latitude, double longitude,
     char hemisphere;
     double easting;
     double northing;
+    fprintf(stderr, "DUPA 3\n");
     if (Convert_Geodetic_To_UTM(d2r(latitude), d2r(longitude), &zone, &hemisphere, &easting, &northing)) {
         fprintf(stderr, "Error during conversion to UTM.\n");
         exit(13);
     }
     map.setZone(zone);
     map.setHemisphere(hemisphere);
+    fprintf(stderr, "DUPA 7\n");
     return std::pair<double, double>(easting, northing);
 }

@@ -52,15 +52,15 @@ int main(int argc, char **argv) {
 
 //    AsciiReader reader;
 //    Map *map = reader.read("data/test2.asc");
-    galois::gDebug("Initial configuration set.");
+    galois::gInfo("Initial configuration set.");
     SrtmReader reader;
     Map *map = reader.read(config.W, config.N, config.E, config.S, config.dataDir.c_str());
-    galois::gDebug("Terrain data read.");
+    galois::gInfo("Terrain data read.");
 //    GraphGenerator::generateSampleGraph(graph);
 //    GraphGenerator::generateSampleGraphWithData(graph, *map, 0, map->getLength() - 1, map->getWidth() - 1, 0, config.version2D);
     GraphGenerator::generateSampleGraphWithDataWithConversionToUtm(graph, *map, config.W, config.N, config.E, config.S,
                                                                    config.version2D);
-    galois::gDebug("Initial graph generated");
+    galois::gInfo("Initial graph generated");
 
     ConnectivityManager connManager{graph};
 //    DummyConditionChecker checker = DummyConditionChecker();
@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
     Production6 production6{connManager};
     vector<Production *> productions = {&production1, &production2, &production3, &production4, &production5,
                                         &production6};
-    galois::gDebug("Loop is being started...");
+    galois::gInfo("Loop is being started...");
 //    afterStep(0, graph);
     for (int j = 0; j < config.steps; j++) {
         galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto &ctx) {
@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
                 checker.execute(node);
             }
         });
-        galois::gDebug("Condition chceking in step ", j, " finished.");
+        galois::gInfo("Condition chceking in step ", j, " finished.");
         galois::StatTimer step(("step" + std::to_string(j)).c_str());
         step.start();
         galois::for_each(galois::iterate(graph.begin(), graph.end()), [&](GNode node, auto &ctx) {
@@ -100,12 +100,12 @@ int main(int argc, char **argv) {
             }
         }, galois::loopname(("step" + std::to_string(j)).c_str()));
         step.stop();
-        galois::gDebug("Step ", j, " finished.");
+        galois::gInfo("Step ", j, " finished.");
     }
-    galois::gDebug("All steps finished.");
+    galois::gInfo("All steps finished.");
 
     MyGraphFormatWriter::writeToFile(graph, config.output);
-    galois::gDebug("Graph written to file ", config.output);
+    galois::gInfo("Graph written to file ", config.output);
     if (config.display) {
         system((std::string("./display.sh ") + config.output).c_str());
     }

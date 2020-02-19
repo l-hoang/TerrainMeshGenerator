@@ -73,6 +73,7 @@
 /*
  *                              INCLUDES
  */
+#include <stdio.h>
 #include "tranmerc.h"
 #include "utm.h"
 /*
@@ -200,91 +201,115 @@ long Convert_Geodetic_To_UTM (double Latitude,
   double False_Easting = 500000;
   double False_Northing = 0;
   double Scale = 0.9996;
+    fprintf(stderr, "DUPA 1\n");
 
-  if ((Latitude < MIN_LAT) || (Latitude > MAX_LAT))
+    if ((Latitude < MIN_LAT) || (Latitude > MAX_LAT))
   { /* Latitude out of range */
-    Error_Code |= UTM_LAT_ERROR;
+      Error_Code |= UTM_LAT_ERROR;
   }
-  if ((Longitude < -PI) || (Longitude > (2*PI)))
+    if ((Longitude < -PI) || (Longitude > (2*PI)))
   { /* Longitude out of range */
-    Error_Code |= UTM_LON_ERROR;
+      Error_Code |= UTM_LON_ERROR;
   }
-  if (!Error_Code)
+    if (!Error_Code)
   { /* no errors */
-    if((Latitude > -1.0e-9) && (Latitude < 0))
-      Latitude = 0.0;
-    if (Longitude < 0)
-      Longitude += (2*PI) + 1.0e-10;
+      if((Latitude > -1.0e-9) && (Latitude < 0)) {
+          Latitude = 0.0;
+      }
+      if (Longitude < 0) {
+          Longitude += (2*PI) + 1.0e-10;
+      }
 
-    Lat_Degrees = (long)(Latitude * 180.0 / PI);
-    Long_Degrees = (long)(Longitude * 180.0 / PI);
+      Lat_Degrees = (long)(Latitude * 180.0 / PI);
+      Long_Degrees = (long)(Longitude * 180.0 / PI);
 
-    if (Longitude < PI)
-      temp_zone = (long)(31 + ((Longitude * 180.0 / PI) / 6.0));
-    else
-      temp_zone = (long)(((Longitude * 180.0 / PI) / 6.0) - 29);
+      if (Longitude < PI) {
+          temp_zone = (long)(31 + ((Longitude * 180.0 / PI) / 6.0));
+      }
+    else {
+          temp_zone = (long)(((Longitude * 180.0 / PI) / 6.0) - 29);
+      }
 
-    if (temp_zone > 60)
-      temp_zone = 1;
-    /* UTM special cases */
-    if ((Lat_Degrees > 55) && (Lat_Degrees < 64) && (Long_Degrees > -1)
-        && (Long_Degrees < 3))
-      temp_zone = 31;
-    if ((Lat_Degrees > 55) && (Lat_Degrees < 64) && (Long_Degrees > 2)
-        && (Long_Degrees < 12))
-      temp_zone = 32;
-    if ((Lat_Degrees > 71) && (Long_Degrees > -1) && (Long_Degrees < 9))
-      temp_zone = 31;
-    if ((Lat_Degrees > 71) && (Long_Degrees > 8) && (Long_Degrees < 21))
-      temp_zone = 33;
-    if ((Lat_Degrees > 71) && (Long_Degrees > 20) && (Long_Degrees < 33))
-      temp_zone = 35;
-    if ((Lat_Degrees > 71) && (Long_Degrees > 32) && (Long_Degrees < 42))
-      temp_zone = 37;
+      if (temp_zone > 60) {
+          temp_zone = 1;
+      }
+      /* UTM special cases */
+      if ((Lat_Degrees > 55) && (Lat_Degrees < 64) && (Long_Degrees > -1)
+        && (Long_Degrees < 3)) {
+          temp_zone = 31;
+      }
+      if ((Lat_Degrees > 55) && (Lat_Degrees < 64) && (Long_Degrees > 2)
+        && (Long_Degrees < 12)) {
+          temp_zone = 32;
+      }
+      if ((Lat_Degrees > 71) && (Long_Degrees > -1) && (Long_Degrees < 9)) {
+          temp_zone = 31;
+      }
+      if ((Lat_Degrees > 71) && (Long_Degrees > 8) && (Long_Degrees < 21)) {
+          temp_zone = 33;
+      }
+      if ((Lat_Degrees > 71) && (Long_Degrees > 20) && (Long_Degrees < 33)) {
+          temp_zone = 35;
+      }
+      if ((Lat_Degrees > 71) && (Long_Degrees > 32) && (Long_Degrees < 42)) {
+          temp_zone = 37;
+      }
 
-    if (UTM_Override)
+      if (UTM_Override)
     {
-      if ((temp_zone == 1) && (UTM_Override == 60))
-        temp_zone = UTM_Override;
-      else if ((temp_zone == 60) && (UTM_Override == 1))
-        temp_zone = UTM_Override;
+        if ((temp_zone == 1) && (UTM_Override == 60)) {
+            temp_zone = UTM_Override;
+        }
+      else if ((temp_zone == 60) && (UTM_Override == 1)) {
+            temp_zone = UTM_Override;
+        }
       else if ((Lat_Degrees > 71) && (Long_Degrees > -1) && (Long_Degrees < 42))
       {
-        if (((temp_zone-2) <= UTM_Override) && (UTM_Override <= (temp_zone+2)))
-          temp_zone = UTM_Override;
-        else
-          Error_Code = UTM_ZONE_OVERRIDE_ERROR;
+          if (((temp_zone-2) <= UTM_Override) && (UTM_Override <= (temp_zone+2))) {
+              temp_zone = UTM_Override;
+          }
+        else {
+              Error_Code = UTM_ZONE_OVERRIDE_ERROR;
+          }
       }
-      else if (((temp_zone-1) <= UTM_Override) && (UTM_Override <= (temp_zone+1)))
-        temp_zone = UTM_Override;
-      else
-        Error_Code = UTM_ZONE_OVERRIDE_ERROR;
+      else if (((temp_zone-1) <= UTM_Override) && (UTM_Override <= (temp_zone+1))) {
+            temp_zone = UTM_Override;
+        }
+      else {
+            Error_Code = UTM_ZONE_OVERRIDE_ERROR;
+        }
     }
-    if (!Error_Code)
+      if (!Error_Code)
     {
-      if (temp_zone >= 31)
-        Central_Meridian = (6 * temp_zone - 183) * PI / 180.0;
-      else
-        Central_Meridian = (6 * temp_zone + 177) * PI / 180.0;
-      *Zone = temp_zone;
-      if (Latitude < 0)
+        if (temp_zone >= 31) {
+            Central_Meridian = (6 * temp_zone - 183) * PI / 180.0;
+        }
+      else {
+            Central_Meridian = (6 * temp_zone + 177) * PI / 180.0;
+        }
+        *Zone = temp_zone;
+        if (Latitude < 0)
       {
-        False_Northing = 10000000;
-        *Hemisphere = 'S';
+          False_Northing = 10000000;
+          *Hemisphere = 'S';
       }
-      else
-        *Hemisphere = 'N';
-      Set_Transverse_Mercator_Parameters(UTM_a, UTM_f, Origin_Latitude,
+      else {
+            *Hemisphere = 'N';
+        }
+        Set_Transverse_Mercator_Parameters(UTM_a, UTM_f, Origin_Latitude,
                                          Central_Meridian, False_Easting, False_Northing, Scale);
-      Convert_Geodetic_To_Transverse_Mercator(Latitude, Longitude, Easting,
+        Convert_Geodetic_To_Transverse_Mercator(Latitude, Longitude, Easting,
                                               Northing);
-      if ((*Easting < MIN_EASTING) || (*Easting > MAX_EASTING))
-        Error_Code = UTM_EASTING_ERROR;
-      if ((*Northing < MIN_NORTHING) || (*Northing > MAX_NORTHING))
-        Error_Code |= UTM_NORTHING_ERROR;
+        if ((*Easting < MIN_EASTING) || (*Easting > MAX_EASTING)) {
+            Error_Code = UTM_EASTING_ERROR;
+        }
+        if ((*Northing < MIN_NORTHING) || (*Northing > MAX_NORTHING)) {
+            Error_Code |= UTM_NORTHING_ERROR;
+        }
     }
   } /* END OF if (!Error_Code) */
-  return (Error_Code);
+    fprintf(stderr, "DUPA 2\n");
+    return (Error_Code);
 } /* END OF Convert_Geodetic_To_UTM */
 
 
