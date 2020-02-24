@@ -20,12 +20,15 @@ Map* SrtmReader::read(
 
   size_t cols       = (size_t)(east_border_int - west_border_int);
   size_t rows       = (size_t)(north_border_int - south_border_int);
+  // mallocs an entire grid of doubles based on borders; to be read in later
+  // from disk
   double** map_data = Map::init_map_data(rows, cols);
   Map* map          = new Map(map_data, cols, rows, 1. / VALUES_IN_DEGREE,
                      1. / VALUES_IN_DEGREE);
   map->setNorthBorder(north_border);
   map->setWestBorder(west_border);
 
+  // read in points within specified borders
   read_from_multiple_files(west_border, north_border, east_border, south_border,
                            map_dir, map_data);
 
@@ -50,6 +53,7 @@ void SrtmReader::read_from_multiple_files(const double west_border,
                     ? south_border
                     : north_border - 1;
   }
+  // loop over y-axis
   while (Utils::is_greater(north_ptr, south_border)) {
     int north_ptr_int = border_to_int(north_ptr);
     size_t rows_here =
@@ -61,11 +65,13 @@ void SrtmReader::read_from_multiple_files(const double west_border,
                           ? east_border
                           : Utils::ceil2(west_border);
 
+    // loop over x-axis
     while (Utils::is_lesser(west_ptr, east_border)) {
       int west_ptr_int = border_to_int(west_ptr);
       size_t cols_here =
           (size_t)std::abs(border_to_int(east_ptr) - west_ptr_int);
 
+      // determine file to read and actual do read
       read_from_file(north_ptr_int, west_ptr_int, rows_here, cols_here,
                      first_free_row, first_free_col, map_data, map_dir);
 
@@ -117,6 +123,7 @@ void SrtmReader::read_from_file(int north_border_int, int west_border_int,
     }
     for (size_t j = 0; j < cols; ++j) {
       Utils::change_bytes_order(&(buffer[j]));
+      // here is where data is being written after being read
       map_data[first_row + i][first_col + j] = buffer[j];
     }
   }
@@ -132,6 +139,7 @@ void SrtmReader::skip_outliers(double* const* map_data, size_t length,
   bool outlierFound = false;
   for (int i = 0; i < length; ++i) {
     for (int j = 0; j < width; ++j) {
+      // smooth out outlier point here
       if (map_data[i][j] > 3000 || map_data[i][j] < 10) {
         outlierFound = true;
         if (i > 0) {
