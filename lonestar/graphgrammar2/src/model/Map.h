@@ -4,6 +4,10 @@
 
 #include <cstdlib>
 
+/**
+ * Holds the elevation of a particular point for some specified region (borders
+ * and their lengths).
+ */
 class Map {
 private:
     size_t width;

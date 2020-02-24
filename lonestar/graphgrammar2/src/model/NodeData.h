@@ -5,10 +5,10 @@
 
 class NodeData {
 private:
-  bool hyperEdge;
-  Coordinates coords;
-  bool toRefine;
-  bool hanging;
+  bool hyperEdge; //!< Indicates if node is a metanode to track triangles
+  Coordinates coords; //!< Coordinates of node
+  bool toRefine; //!< Indicates if node needs to be refined
+  bool hanging; //!< Indicates hanging node status
 
 public:
   NodeData(bool isHyperEdge, const Coordinates& coords, bool hanging)
@@ -23,6 +23,8 @@ public:
       : hyperEdge(isHyperEdge), coords(), toRefine(toRefine), hanging(false) {
     setCoords(coords);
   }
+
+  // self-explanatory set/get functions
 
   Coordinates getCoords() const { return coords; }
 
