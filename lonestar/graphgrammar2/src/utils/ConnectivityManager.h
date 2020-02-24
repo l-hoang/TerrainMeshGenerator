@@ -5,9 +5,12 @@
 #include "../model/Graph.h"
 
 class ConnectivityManager {
+private:
+  Graph& graph;
 public:
   ConnectivityManager(Graph& graph) : graph(graph) {}
 
+  //! Return a vector of neighbors given some vertex
   std::vector<GNode> getNeighbours(GNode node) const {
     std::vector<GNode> vertices;
     for (Graph::edge_iterator ii = graph.edge_begin(node),
@@ -54,6 +57,8 @@ public:
     return counter;
   }
 
+  //! Attempts to find a node between two nodes (i.e. find midpoint, if it
+  //! exists)
   optional<GNode> findNodeBetween(const GNode& node1,
                                   const GNode& node2) const {
     Coordinates expectedLocation =
@@ -72,50 +77,77 @@ public:
     return optional<GNode>();
   }
 
+  //! Creates a node and adds to specified worklist; returns it as well
   GNode createNode(NodeData& nodeData, galois::UserContext<GNode>& ctx) const {
     GNode node = createNode(nodeData);
     ctx.push(node);
     return std::move(node);
   }
 
+  //! Adds a new node to the graph; returns node id
   GNode createNode(NodeData nodeData) const {
     auto node = graph.createNode(nodeData);
     graph.addNode(node);
     return node;
   }
 
+  /**
+   * Create a new edge; need to specify if border, the middle point, and
+   * its length
+   *
+   * NOTE: can theoretically calculate middle + length given just the
+   * two nodes
+   */
   void createEdge(GNode& node1, GNode& node2, bool border,
                   const Coordinates& middlePoint, double length) {
+    // add the edge
     graph.addEdge(node1, node2);
+    // get the edge
     const EdgeIterator& edge = graph.findEdge(node1, node2);
+    // edit its edge data
     graph.getEdgeData(edge).setBorder(border);
     graph.getEdgeData(edge).setMiddlePoint(middlePoint);
     graph.getEdgeData(edge).setLength(length);
   }
 
+  /**
+   * Connects 3 nodes with a hyperedge; should be a triangle.
+   *
+   * Adds the new node to a worklist as well.
+   */
   void createInterior(const GNode& node1, const GNode& node2,
                       const GNode& node3,
                       galois::UserContext<GNode>& ctx) const {
+    // args: is a hyper edge + do not need to refine
     NodeData interiorData = NodeData{true, false};
     auto interior         = createNode(interiorData, ctx);
 
+    // connect hyperedge to triangle
     graph.addEdge(interior, node1);
     graph.addEdge(interior, node2);
     graph.addEdge(interior, node3);
+    // located in center of triangle
     interior->getData().setCoords((node1->getData().getCoords() +
                                    node2->getData().getCoords() +
                                    node3->getData().getCoords()) /
                                   3.);
   }
 
+  /**
+   * Connects 3 nodes with a hyperedge; should be a triangle. Returns
+   * the new node ID.
+   */
   GNode createInterior(const GNode& node1, const GNode& node2,
                        const GNode& node3) const {
+    // args: is a hyper edge + do not need to refine
     NodeData interiorData = NodeData{true, false};
     auto interior         = createNode(interiorData);
 
+    // connect hyperedge to triangle
     graph.addEdge(interior, node1);
     graph.addEdge(interior, node2);
     graph.addEdge(interior, node3);
+    // located in center of triangle
     interior->getData().setCoords((node1->getData().getCoords() +
                                    node2->getData().getCoords() +
                                    node3->getData().getCoords()) /
@@ -123,8 +155,10 @@ public:
     return std::move(interior);
   }
 
+  //! Return reference underlying graph
   Graph& getGraph() const { return graph; }
 
+  //! Get the coordinates of all neighbors of specified vertex and return them.
   const std::vector<Coordinates> getVerticesCoords(const GNode& node) const {
     std::vector<Coordinates> result;
     for (auto neighbour : getNeighbours(node)) {
@@ -146,9 +180,6 @@ public:
     }
     std::cerr << "Problem in removing an edge." << std::endl;
   }
-
-private:
-  Graph& graph;
 };
 
 #endif // GALOIS_CONNECTIVITYMANAGER_H
