@@ -31,11 +31,12 @@ int main(int argc, char** argv) {
   Config config = Config{argc, argv};
 
   galois::SharedMemSys G;
+  // uses own threading functions
   if (config.cores > 0) {
     galois::setActiveThreads(config.cores);
   }
 
-  LonestarStart(argc, argv, name, desc, url); //---------
+  LonestarStart(argc, argv, name, desc, url);
   Graph graph{};
 
   galois::reportPageAlloc("MeminfoPre1");
@@ -43,6 +44,7 @@ int main(int argc, char** argv) {
   // e.g., Intel MIC. May not be enough for deterministic execution
   constexpr size_t NODE_SIZE = sizeof(**graph.begin());
 
+  // preallocating memory
   galois::preAlloc(5 * galois::getActiveThreads() +
                    NODE_SIZE * 32 * graph.size() /
                        galois::runtime::pagePoolSize());
@@ -53,16 +55,19 @@ int main(int argc, char** argv) {
   //    Map *map = reader.read("data/test2.asc");
   galois::gInfo("Initial configuration set.");
   SrtmReader reader;
+  // terrain setup:  load terrain heights into the map object
   Map* map = reader.read(config.W, config.N, config.E, config.S,
                          config.dataDir.c_str());
   galois::gInfo("Terrain data read.");
   //    GraphGenerator::generateSampleGraph(graph);
   //    GraphGenerator::generateSampleGraphWithData(graph, *map, 0,
   //    map->getLength() - 1, map->getWidth() - 1, 0, config.version2D);
+  // creates the initial mesh using the borders and the new map
   GraphGenerator::generateSampleGraphWithDataWithConversionToUtm(
       graph, *map, config.W, config.N, config.E, config.S, config.version2D);
   galois::gInfo("Initial graph generated");
 
+  // initialize wrapper over graph object (ConnManager)
   ConnectivityManager connManager{graph};
   //    DummyConditionChecker checker = DummyConditionChecker();
   TerrainConditionChecker checker =
@@ -83,18 +88,25 @@ int main(int argc, char** argv) {
     galois::for_each(galois::iterate(graph.begin(), graph.end()),
                      [&](GNode node, auto& ctx) {
                        if (basicCondition(graph, node)) {
+                         // terrain checker to see if refinement needed
                          checker.execute(node);
                        }
                      });
     galois::gInfo("Condition chceking in step ", j, " finished.");
     galois::StatTimer step(("step" + std::to_string(j)).c_str());
     step.start();
+
     galois::for_each(galois::iterate(graph.begin(), graph.end()),
                      [&](GNode node, auto& ctx) {
+                       // only need to check hyperedges
                        if (!basicCondition(graph, node)) {
                          return;
                        }
+
+                       // TODO pretty sure this can be commented out since
+                       // it will capture connManager outside by reference
                        ConnectivityManager connManager{graph};
+
                        ProductionState pState(
                            connManager, node, config.version2D,
                            [&map](double x, double y) -> double {
@@ -113,6 +125,7 @@ int main(int argc, char** argv) {
   }
   galois::gInfo("All steps finished.");
 
+  // final result writing
   MyGraphFormatWriter::writeToFile(graph, config.output);
   galois::gInfo("Graph written to file ", config.output);
   if (config.display) {
@@ -123,11 +136,13 @@ int main(int argc, char** argv) {
   return 0;
 }
 
+//! Checks if node exists + is hyperedge
 bool basicCondition(const Graph& graph, GNode& node) {
   return graph.containsNode(node, galois::MethodFlag::WRITE) &&
          node->getData().isHyperEdge();
 }
 
+//! Writes intermediate data to file
 void afterStep(int i, Graph& graph) {
   auto path = std::string("out/step") + std::to_string((i - 1)) + ".mgf";
   MyGraphFormatWriter::writeToFile(graph, path);
