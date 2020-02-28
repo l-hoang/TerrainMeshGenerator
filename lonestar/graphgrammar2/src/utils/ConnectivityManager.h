@@ -10,6 +10,7 @@ private:
 public:
   ConnectivityManager(Graph& graph) : graph(graph) {}
 
+
   //! Return a vector of neighbors given some vertex
   std::vector<GNode> getNeighbours(GNode node) const {
     std::vector<GNode> vertices;

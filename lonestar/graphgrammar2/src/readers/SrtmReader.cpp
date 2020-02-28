@@ -53,6 +53,7 @@ void SrtmReader::read_from_multiple_files(const double west_border,
                     ? south_border
                     : north_border - 1;
   }
+
   // loop over y-axis
   while (Utils::is_greater(north_ptr, south_border)) {
     int north_ptr_int = border_to_int(north_ptr);
@@ -70,7 +71,6 @@ void SrtmReader::read_from_multiple_files(const double west_border,
       int west_ptr_int = border_to_int(west_ptr);
       size_t cols_here =
           (size_t)std::abs(border_to_int(east_ptr) - west_ptr_int);
-
       // determine file to read and actual do read
       read_from_file(north_ptr_int, west_ptr_int, rows_here, cols_here,
                      first_free_row, first_free_col, map_data, map_dir);
@@ -150,14 +150,7 @@ void SrtmReader::skip_outliers(double* const* map_data, size_t length,
       }
     }
   }
-  //            if (map_data[i][j] > 3000 || map_data[i][j] < 10) {
-  //                printf("WARNING: Outliers detected. Skipping...\n");
-  //                if (j > 0) {
-  //                    map_data[i][j] = map_data[i][j-1];
-  //                } else {
-  //                    map_data[i][j] = map_data[i][j+1];
-  //                }
-  //            }
+`
   if (outlierFound) {
     galois::gInfo("Outliers in input data detected.");
   }

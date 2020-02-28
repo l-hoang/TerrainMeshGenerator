@@ -36,6 +36,7 @@ int main(int argc, char** argv) {
     galois::setActiveThreads(config.cores);
   }
 
+
   LonestarStart(argc, argv, name, desc, url);
   Graph graph{};
 
@@ -55,6 +56,7 @@ int main(int argc, char** argv) {
   //    Map *map = reader.read("data/test2.asc");
   galois::gInfo("Initial configuration set.");
   SrtmReader reader;
+
   // terrain setup:  load terrain heights into the map object
   Map* map = reader.read(config.W, config.N, config.E, config.S,
                          config.dataDir.c_str());
@@ -62,10 +64,12 @@ int main(int argc, char** argv) {
   //    GraphGenerator::generateSampleGraph(graph);
   //    GraphGenerator::generateSampleGraphWithData(graph, *map, 0,
   //    map->getLength() - 1, map->getWidth() - 1, 0, config.version2D);
+
   // creates the initial mesh using the borders and the new map
   GraphGenerator::generateSampleGraphWithDataWithConversionToUtm(
       graph, *map, config.W, config.N, config.E, config.S, config.version2D);
   galois::gInfo("Initial graph generated");
+
 
   // initialize wrapper over graph object (ConnManager)
   ConnectivityManager connManager{graph};
@@ -88,6 +92,7 @@ int main(int argc, char** argv) {
     galois::for_each(galois::iterate(graph.begin(), graph.end()),
                      [&](GNode node, auto& ctx) {
                        if (basicCondition(graph, node)) {
+
                          // terrain checker to see if refinement needed
                          // based on terrain
                          checker.execute(node);
@@ -116,6 +121,7 @@ int main(int argc, char** argv) {
                              return map->get_height(x, y);
                            });
 
+
                        // loop through productions and apply the first applicable
                        // one
                        for (Production* production : productions) {
@@ -142,11 +148,13 @@ int main(int argc, char** argv) {
   return 0;
 }
 
+
 //! Checks if node exists + is hyperedge
 bool basicCondition(const Graph& graph, GNode& node) {
   return graph.containsNode(node, galois::MethodFlag::WRITE) &&
          node->getData().isHyperEdge();
 }
+
 
 //! Writes intermediate data to file
 void afterStep(int i, Graph& graph) {

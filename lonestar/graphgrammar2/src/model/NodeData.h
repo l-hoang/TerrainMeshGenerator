@@ -5,6 +5,7 @@
 
 class NodeData {
 private:
+
   bool hyperEdge; //!< Indicates if node is a metanode to track triangles
   Coordinates coords; //!< Coordinates of node
   bool toRefine; //!< Indicates if node needs to be refined
@@ -23,6 +24,7 @@ public:
       : hyperEdge(isHyperEdge), coords(), toRefine(toRefine), hanging(false) {
     setCoords(coords);
   }
+
 
   // self-explanatory set/get functions
 

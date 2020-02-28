@@ -16,6 +16,7 @@ private:
   double z;
 
 public:
+
   //! empty constructor: x, y, z initialized to default double
   Coordinates() = default;
 
@@ -68,6 +69,7 @@ public:
     return sqrt(pow(x - rhs.x, 2) + pow(y - rhs.y, 2) + pow(z - rhs.z, 2));
   }
 
+
   //! Distance of just x/y coordinates
   double dist2D(const Coordinates& rhs) const {
     return sqrt(pow(x - rhs.x, 2) + pow(y - rhs.y, 2));
@@ -82,6 +84,7 @@ public:
            std::to_string(z);
   }
 
+
   //! element wise add of x,y,z
   Coordinates operator+(const Coordinates& rhs) const {
     return Coordinates{x + rhs.x, y + rhs.y, z + rhs.z};
@@ -92,20 +95,24 @@ public:
     return Coordinates{x - rhs.x, y - rhs.y, z - rhs.z};
   }
 
+
   //! element wise multiply of x,y,z
   Coordinates operator*(double rhs) const {
     return Coordinates{x * rhs, y * rhs, z * rhs};
   }
+
 
   //! element wise divide of x,y,z
   Coordinates operator/(double rhs) const {
     return Coordinates{x / rhs, y / rhs, z / rhs};
   }
 
+
   //! element wise equality check
   bool operator==(const Coordinates& rhs) const {
     return equals(x, rhs.x) && equals(y, rhs.y) && equals(z, rhs.z);
   }
+
 
   //! element wise inequality check
   bool operator!=(const Coordinates& rhs) const { return !(rhs == *this); }

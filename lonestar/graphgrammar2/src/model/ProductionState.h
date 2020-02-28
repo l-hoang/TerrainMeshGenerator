@@ -12,6 +12,7 @@ using std::vector;
  */
 class ProductionState {
 private:
+
   //! hyperedge ID
   GNode& interior;
   //! hyperedge data
@@ -49,6 +50,7 @@ public:
         edgesIterators(connManager.getTriangleEdges(vertices)),
         version2D(version2D), zGetter(zGetter) {
     Graph& graph = connManager.getGraph();
+
     // loop over 3 nodes/edges of triangle (if they exist)
     for (int i = 0; i < 3; ++i) {
       auto maybeEdgeIter = edgesIterators[i];
@@ -59,6 +61,7 @@ public:
       lengths.push_back(maybeEdgeIter ? edgesData[i].get().getLength() : -1);
       verticesData.push_back(
           graph.getData(vertices[i])); // TODO: Look for possible optimization
+
       // if an edge doesn't exist, push to broken edges
       if (!maybeEdgeIter) {
         brokenEdges.push_back(i);

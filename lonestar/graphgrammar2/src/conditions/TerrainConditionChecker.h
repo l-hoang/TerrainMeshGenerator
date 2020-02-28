@@ -17,12 +17,14 @@ public:
                                    ConnectivityManager& connManager, Map& map)
       : tolerance(tolerance), connManager(connManager), map(map) {}
 
+
   //! Only refine if meets inside_condition + is hyperedge node
   bool execute(GNode& node) override {
     NodeData& nodeData = node->getData();
     if (!nodeData.isHyperEdge()) {
       return false;
     }
+
 
     // gets coordinates of vertices connected by this hyperedge
     vector<Coordinates> verticesCoords = connManager.getVerticesCoords(node);
@@ -43,24 +45,28 @@ private:
   bool inside_condition(
       const vector<Coordinates>&
           verticesCoords) { // TODO: Find better point location algorithm
+
     // lowest x among 3
     double lowest_x = verticesCoords[0].getX() < verticesCoords[1].getX()
                           ? verticesCoords[0].getX()
                           : verticesCoords[1].getX();
     lowest_x = verticesCoords[2].getX() < lowest_x ? verticesCoords[2].getX()
                                                    : lowest_x;
+
     // highest x among 3
     double highest_x = verticesCoords[0].getX() > verticesCoords[1].getX()
                            ? verticesCoords[0].getX()
                            : verticesCoords[1].getX();
     highest_x = verticesCoords[2].getX() > highest_x ? verticesCoords[2].getX()
                                                      : highest_x;
+
     // lowest y among 3
     double lowest_y = verticesCoords[0].getY() < verticesCoords[1].getY()
                           ? verticesCoords[0].getY()
                           : verticesCoords[1].getY();
     lowest_y = verticesCoords[2].getY() < lowest_y ? verticesCoords[2].getY()
                                                    : lowest_y;
+
     // highest y among 3
     double highest_y = verticesCoords[0].getY() > verticesCoords[1].getY()
                            ? verticesCoords[0].getY()

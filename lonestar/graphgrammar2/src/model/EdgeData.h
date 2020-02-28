@@ -41,5 +41,4 @@ public:
     EdgeData::middlePoint.setXYZ(x, y, z);
   }
 };
-
 #endif // GALOIS_EDGEDATA_H

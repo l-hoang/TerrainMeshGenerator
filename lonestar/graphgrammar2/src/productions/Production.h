@@ -47,6 +47,7 @@ protected:
            !less(lengths[2] + lengths[3], lengths[1]);
   }
 
+
   //! vertices of an edge
   //! assumption: edges connect vertices that have adjacent IDs
   std::pair<int, int> getEdgeVertices(int edge) const {
@@ -89,6 +90,7 @@ protected:
   }
 
 private:
+
   //! Creates a new node on an edge + its endpoints; does not
   //! create corresponding hyperedges
   GNode createNodeOnEdge(int edgeToBreak, ProductionState& pState,
@@ -118,6 +120,7 @@ private:
         pState.getVerticesData()[edgeVertices.first].getCoords(),
         pState.getVerticesData()[edgeVertices.second].getCoords(),
         pState.getZGetter());
+
 
     // create the new node, push to graph and worklist
     // note: border nodes are never hanging; hanging means it needs to be
