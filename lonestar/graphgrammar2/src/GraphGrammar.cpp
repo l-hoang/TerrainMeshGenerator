@@ -89,6 +89,7 @@ int main(int argc, char** argv) {
                      [&](GNode node, auto& ctx) {
                        if (basicCondition(graph, node)) {
                          // terrain checker to see if refinement needed
+                         // based on terrain
                          checker.execute(node);
                        }
                      });
@@ -107,11 +108,16 @@ int main(int argc, char** argv) {
                        // it will capture connManager outside by reference
                        ConnectivityManager connManager{graph};
 
+                       // TODO does this have to be initialized for every one?
+                       // may be able to optimize
                        ProductionState pState(
                            connManager, node, config.version2D,
                            [&map](double x, double y) -> double {
                              return map->get_height(x, y);
                            });
+
+                       // loop through productions and apply the first applicable
+                       // one
                        for (Production* production : productions) {
                          if (production->execute(pState, ctx)) {
                            afterStep(j, graph);
