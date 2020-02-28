@@ -21,6 +21,11 @@ public:
     return vertices;
   }
 
+  //! Given 3 nodes that comprise a triangle, return the triangle's edges
+  //! Key is that edges will be returned such that it is 0->1, 1->2,
+  //! and 2->0
+  //! Assumption for this to work is that the triangle order is 0->1,
+  //! 1->2, and 2->0 else you will get an empty edge
   std::vector<optional<EdgeIterator>>
   getTriangleEdges(std::vector<GNode> vertices) {
     std::vector<optional<EdgeIterator>> edges;
@@ -30,11 +35,13 @@ public:
     return edges;
   }
 
+  //! Return an edge (if it exists; may have been broken into 2)
   optional<EdgeIterator> getEdge(const GNode& v1, const GNode& v2) const {
     EdgeIterator edge = graph.findEdge(v1, v2);
     return convertToOptionalEdge(edge);
   }
 
+  //! See if an edge exists and return optional if necessary
   optional<EdgeIterator> convertToOptionalEdge(const EdgeIterator& edge) const {
     if (edge.base() == edge.end()) {
       return galois::optional<EdgeIterator>();
@@ -43,10 +50,13 @@ public:
     }
   }
 
+  //! True if there's a broken edge in the vector of edges
   bool hasBrokenEdge(const std::vector<optional<EdgeIterator>>& edges) const {
     return countBrokenEdges(edges) > 0;
   }
 
+  //! Count the number of edges that don't exist (i.e. broken) in a vector
+  //! of edges
   int countBrokenEdges(const std::vector<optional<EdgeIterator>>& edges) const {
     int counter = 0;
     for (const optional<EdgeIterator>& edge : edges) {
@@ -136,6 +146,9 @@ public:
   /**
    * Connects 3 nodes with a hyperedge; should be a triangle. Returns
    * the new node ID.
+   *
+   * For consistency, node1->node2->node3 edge order is probably
+   * preferred.
    */
   GNode createInterior(const GNode& node1, const GNode& node2,
                        const GNode& node3) const {
@@ -167,6 +180,7 @@ public:
     return result;
   }
 
+  //! Remove edge node1->node2 or node2->node1 (whichever is found)
   void removeEdge(const GNode& node1, const GNode& node2) const {
     const EdgeIterator& edge1 = graph.findEdge(node1, node2);
     if (edge1.base() != edge1.end()) {
