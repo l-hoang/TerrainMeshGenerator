@@ -1,130 +1,87 @@
 #ifndef TERGEN_MAP_H
 #define TERGEN_MAP_H
 
-
 #include <cstdlib>
 
 class Map {
 private:
-    size_t width;
+  size_t width;
 
-    size_t length;
+  size_t length;
 
-    double cell_width;
+  double cell_width;
 
-    double cell_length;
+  double cell_length;
 
-    double **data;
+  double** data;
 
-    double north_border;
+  double north_border;
 
-    double west_border;
+  double west_border;
 
-    bool utm; //TODO: Consider moving it to some better place
+  bool utm; // TODO: Consider moving it to some better place
 
-    long zone;
+  long zone;
 
-    char hemisphere;
+  char hemisphere;
 
-    double get_height_wo_interpol(double lon, double lat, int corner);
+  double get_height_wo_interpol(double lon, double lat, int corner);
 
 public:
-    Map(double **data, size_t width, size_t length, double cellWidth, double cellLength) : width(width),
-                                                                                           length(length),
-                                                                                           cell_width(cellWidth),
-                                                                                           cell_length(cellLength),
-                                                                                           data(data), utm(true) {}
+  Map(double** data, size_t width, size_t length, double cellWidth,
+      double cellLength)
+      : width(width), length(length), cell_width(cellWidth),
+        cell_length(cellLength), data(data), utm(true) {}
 
-    static double **init_map_data(size_t rows, size_t cols);
+  static double** init_map_data(size_t rows, size_t cols);
 
-    void print_map();
+  void print_map();
 
-    double get_height(double lon, double lat);
+  double get_height(double lon, double lat);
 
-    double get_height(double lon, double lat, bool convert);
+  double get_height(double lon, double lat, bool convert);
 
-    size_t getWidth() const {
-        return width;
-    }
+  size_t getWidth() const { return width; }
 
-    void setWidth(size_t width) {
-        Map::width = width;
-    }
+  void setWidth(size_t width) { Map::width = width; }
 
-    size_t getLength() const {
-        return length;
-    }
+  size_t getLength() const { return length; }
 
-    void setLength(size_t length) {
-        Map::length = length;
-    }
+  void setLength(size_t length) { Map::length = length; }
 
-    double getCellWidth() const {
-        return cell_width;
-    }
+  double getCellWidth() const { return cell_width; }
 
-    void setCellWidth(double cellWidth) {
-        cell_width = cellWidth;
-    }
+  void setCellWidth(double cellWidth) { cell_width = cellWidth; }
 
-    double getCellLength() const {
-        return cell_length;
-    }
+  double getCellLength() const { return cell_length; }
 
-    void setCellLength(double cellLength) {
-        cell_length = cellLength;
-    }
+  void setCellLength(double cellLength) { cell_length = cellLength; }
 
-    double **getData() const {
-        return data;
-    }
+  double** getData() const { return data; }
 
-    void setData(double **data) {
-        Map::data = data;
-    }
+  void setData(double** data) { Map::data = data; }
 
-    double getNorthBorder() const {
-        return north_border;
-    }
+  double getNorthBorder() const { return north_border; }
 
-    void setNorthBorder(double northBorder) {
-        north_border = northBorder;
-    }
+  void setNorthBorder(double northBorder) { north_border = northBorder; }
 
-    double getWestBorder() const {
-        return west_border;
-    }
+  double getWestBorder() const { return west_border; }
 
-    void setWestBorder(double westBorder) {
-        west_border = westBorder;
-    }
+  void setWestBorder(double westBorder) { west_border = westBorder; }
 
-    bool isUtm() const {
-        return utm;
-    }
+  bool isUtm() const { return utm; }
 
-    void setUtm(bool utm) {
-        Map::utm = utm;
-    }
+  void setUtm(bool utm) { Map::utm = utm; }
 
-    long getZone() const {
-        return zone;
-    }
+  long getZone() const { return zone; }
 
-    void setZone(long zone) {
-        Map::zone = zone;
-    }
+  void setZone(long zone) { Map::zone = zone; }
 
-    char getHemisphere() const {
-        return hemisphere;
-    }
+  char getHemisphere() const { return hemisphere; }
 
-    void setHemisphere(char hemisphere) {
-        Map::hemisphere = hemisphere;
-    }
+  void setHemisphere(char hemisphere) { Map::hemisphere = hemisphere; }
 
-    ~Map();
+  ~Map();
 };
 
-
-#endif //TERGEN_MAP_H
+#endif // TERGEN_MAP_H
